@@ -36,13 +36,13 @@ LDFLAGS := -ldflags "-X $(FULLPKG)/build.Commit=$(COMMIT)"
 # and omit the DWARF symbol table (-w). Also we clear the build ID.
 RELEASE_LDFLAGS := $(call make_ldflags, $(RELEASE_TAGS), -s -w -buildid=)
 
-DCRD_COMMIT := release-v1.6.2
+DCRD_COMMIT := 75b0f68a3583b8fb49e58151f283fdd63572e451
 DCRD_META := "$(DCRD_COMMIT).from-dcrlnd"
 DCRD_LDFLAGS := "-X github.com/decred/dcrd/internal/version.BuildMetadata=$(DCRD_META)"
 DCRD_TMPDIR := $(shell mktemp -d)
 
 DCRWALLET_REPO := github.com/decred/dcrwallet
-DCRWALLET_COMMIT := release-v1.6
+DCRWALLET_COMMIT := f90c236111a40ea8fcd663d0f118338489e3f993
 DCRWALLET_META := $(DCRWALLET_COMMIT).from-dcrlnd
 DCRWALLET_LDFLAGS := "-X decred.org/dcrwallet/version.BuildMetadata=$(DCRWALLET_META)"
 DCRWALLET_TMPDIR := $(shell mktemp -d)
@@ -114,7 +114,7 @@ dcrd:
 	git clone https://github.com/decred/dcrd $(DCRD_TMPDIR)
 	cd $(DCRD_TMPDIR) && \
 		git checkout $(DCRD_COMMIT) && \
-		GO111MODULE=on go install -ldflags $(DCRD_LDFLAGS) . 
+		GO111MODULE=on go build -o "$$GOPATH/bin/dcrd-dcrlnd" -ldflags $(DCRD_LDFLAGS) . 
 	rm -rf $(DCRD_TMPDIR)
 
 dcrwallet:
@@ -213,13 +213,13 @@ ci-itest: itest
 
 package-test-binaries: dcrd dcrwallet build-itest
 	@$(call print, "Creating test binaries package $(TESTBINPKG)")
-	tar --transform 's/.*\///g' -czf $(TESTBINPKG) $(GO_BIN)/dcrd $(GO_BIN)/dcrwallet-dcrlnd dcrlnd-itest dcrlncli-itest
+	tar --transform 's/.*\///g' -czf $(TESTBINPKG) $(GO_BIN)/dcrd-dcrlnd $(GO_BIN)/dcrwallet-dcrlnd dcrlnd-itest dcrlncli-itest
 
 unpack-test-binaries:
 	@$(call print, "Unpacking test binaries from $(TESTBINPKG)")
 	tar -xf $(TESTBINPKG)
 	mkdir -p $(GO_BIN)
-	mv dcrd $(GO_BIN)/dcrd
+	mv dcrd-dcrlnd $(GO_BIN)/dcrd-dcrlnd
 	mv dcrwallet-dcrlnd $(GO_BIN)/dcrwallet-dcrlnd
 
 # =============

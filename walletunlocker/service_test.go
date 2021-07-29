@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"decred.org/dcrwallet/wallet"
+	"decred.org/dcrwallet/v2/wallet"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrlnd/aezeed"
 	"github.com/decred/dcrlnd/channeldb"

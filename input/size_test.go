@@ -4,10 +4,9 @@ import (
 	"testing"
 
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/keychain"
@@ -49,12 +48,12 @@ func TestTxSizeEstimator(t *testing.T) {
 	// Static test data.
 	var nullData [73]byte
 
-	p2pkhAddr, err := dcrutil.NewAddressPubKeyHash(
-		nullData[:20], netParams, dcrec.STEcdsaSecp256k1)
+	p2pkhAddr, err := stdaddr.NewAddressPubKeyHashEcdsaSecp256k1V0(
+		nullData[:20], netParams)
 	if err != nil {
 		t.Fatalf("Failed to generate address: %v", err)
 	}
-	p2pkhPkScript, err := txscript.PayToAddrScript(p2pkhAddr)
+	p2pkhPkScript, err := input.PayToAddrScript(p2pkhAddr)
 	if err != nil {
 		t.Fatalf("Failed to generate scriptPubKey: %v", err)
 	}
@@ -67,11 +66,11 @@ func TestTxSizeEstimator(t *testing.T) {
 		t.Fatalf("Failed to generate p2pkhSigScript: %v", err)
 	}
 
-	p2shAddr, err := dcrutil.NewAddressScriptHashFromHash(nullData[:20], netParams)
+	p2shAddr, err := stdaddr.NewAddressScriptHashV0FromHash(nullData[:20], netParams)
 	if err != nil {
 		t.Fatalf("Failed to generate address: %v", err)
 	}
-	p2shPkScript, err := txscript.PayToAddrScript(p2shAddr)
+	p2shPkScript, err := input.PayToAddrScript(p2shAddr)
 	if err != nil {
 		t.Fatalf("Failed to generate scriptPubKey: %v", err)
 	}

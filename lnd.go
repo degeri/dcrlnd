@@ -27,9 +27,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"decred.org/dcrwallet/wallet"
-	"github.com/decred/dcrd/dcrutil/v3"
-	walletloader "github.com/decred/dcrlnd/lnwallet/dcrwallet/loader"
+	"decred.org/dcrwallet/v2/wallet"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	proxy "github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	"github.com/decred/dcrlnd/autopilot"
@@ -42,6 +41,7 @@ import (
 	"github.com/decred/dcrlnd/lnrpc"
 	"github.com/decred/dcrlnd/lnwallet"
 	"github.com/decred/dcrlnd/lnwallet/dcrwallet"
+	walletloader "github.com/decred/dcrlnd/lnwallet/dcrwallet/loader"
 	"github.com/decred/dcrlnd/macaroons"
 	"github.com/decred/dcrlnd/signal"
 	"github.com/decred/dcrlnd/tor"
@@ -577,7 +577,7 @@ func Main(cfg *Config, lisCfg ListenerCfg, shutdownChan <-chan struct{}) error {
 			DB:             towerDB,
 			EpochRegistrar: activeChainControl.chainNotifier,
 			Net:            cfg.net,
-			NewAddress: func() (dcrutil.Address, error) {
+			NewAddress: func() (stdaddr.Address, error) {
 				return activeChainControl.wallet.NewAddress(
 					lnwallet.WitnessPubKey, false,
 				)

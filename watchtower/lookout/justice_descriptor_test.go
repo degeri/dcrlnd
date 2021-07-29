@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/decred/dcrd/blockchain/v3"
+	"github.com/decred/dcrd/blockchain/v4"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/dcrutil/v3/txsort"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/dcrutil/v4/txsort"
+	"github.com/decred/dcrd/txscript/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/keychain"
@@ -238,7 +238,7 @@ func testJusticeDescriptor(t *testing.T, blobType blob.Type) {
 	}
 
 	// Verify that our test justice transaction is sane.
-	if err := blockchain.CheckTransactionSanity(justiceTxn, netParams, false); err != nil {
+	if err := blockchain.CheckTransactionSanity(justiceTxn, netParams); err != nil {
 		t.Fatalf("justice txn is not sane: %v", err)
 	}
 

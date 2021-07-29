@@ -20,18 +20,18 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/decred/dcrlnd/chainntnfs/dcrdnotify"
 
-	_ "decred.org/dcrwallet/wallet/drivers/bdb"
+	_ "decred.org/dcrwallet/v2/wallet/drivers/bdb"
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrjson/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	dcrutilv3 "github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/dcrutil/v4"
+	dcrutilv3 "github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/rpcclient/v7"
 	"github.com/decred/dcrd/rpctest"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/stretchr/testify/require"
 
@@ -165,7 +165,7 @@ func newPkScript(t *testing.T, w *lnwallet.LightningWallet,
 	if err != nil {
 		t.Fatalf("unable to create new address: %v", err)
 	}
-	pkScript, err := txscript.PayToAddrScript(addr)
+	pkScript, err := input.PayToAddrScript(addr)
 	if err != nil {
 		t.Fatalf("unable to create output script: %v", err)
 	}
@@ -259,7 +259,7 @@ func loadTestCredits(miner *rpctest.Harness, w *lnwallet.LightningWallet,
 		return err
 	}
 	expectedBalance += dcrutil.Amount(int64(atomsPerOutput) * int64(numOutputs))
-	addrs := make([]dcrutil.Address, numOutputs)
+	addrs := make([]stdaddr.Address, numOutputs)
 	for i := 0; i < numOutputs; i++ {
 		// Grab a fresh address from the wallet to house this output.
 		addrs[i], err = w.NewAddress(lnwallet.PubKeyHash, false)
@@ -278,7 +278,7 @@ func loadTestCredits(miner *rpctest.Harness, w *lnwallet.LightningWallet,
 	time.Sleep(time.Millisecond * 200)
 
 	for _, walletAddr := range addrs {
-		script, err := txscript.PayToAddrScript(walletAddr)
+		script, err := input.PayToAddrScript(walletAddr)
 		if err != nil {
 			return err
 		}
@@ -1157,7 +1157,7 @@ func testListTransactionDetails(miner *rpctest.Harness,
 	const numTxns = 5
 	const outputAmt = dcrutil.AtomsPerCoin
 	var err error
-	addrs := make([]dcrutil.Address, numTxns)
+	addrs := make([]stdaddr.Address, numTxns)
 	for i := 0; i < numTxns; i++ {
 		addrs[i], err = alice.NewAddress(lnwallet.PubKeyHash, false)
 		if err != nil {
@@ -1170,7 +1170,7 @@ func testListTransactionDetails(miner *rpctest.Harness,
 
 	txids := make(map[chainhash.Hash]struct{})
 	for i := 0; i < numTxns; i++ {
-		script, err := txscript.PayToAddrScript(addrs[i])
+		script, err := input.PayToAddrScript(addrs[i])
 		if err != nil {
 			t.Fatalf("unable to create output script: %v", err)
 		}
@@ -1271,7 +1271,7 @@ func testListTransactionDetails(miner *rpctest.Harness,
 			t.Fatalf("tx (%v) not found in block (%v)",
 				txDetail.Hash, txDetail.BlockHash)
 		} else {
-			var destinationAddresses []dcrutil.Address
+			var destinationAddresses []stdaddr.Address
 
 			for _, txOut := range txOuts {
 				_, addrs, _, err :=
@@ -1483,7 +1483,7 @@ func testTransactionSubscriptions(miner *rpctest.Harness,
 
 	// Next, fetch a fresh address from the wallet, create 3 new outputs
 	// with the pkScript.
-	addrs := make([]dcrutil.Address, numTxns)
+	addrs := make([]stdaddr.Address, numTxns)
 	for i := 0; i < numTxns; i++ {
 		addrs[i], err = alice.NewAddress(lnwallet.PubKeyHash, false)
 		if err != nil {
@@ -1496,7 +1496,7 @@ func testTransactionSubscriptions(miner *rpctest.Harness,
 	time.Sleep(time.Millisecond * 50)
 
 	for i := 0; i < numTxns; i++ {
-		script, err := txscript.PayToAddrScript(addrs[i])
+		script, err := input.PayToAddrScript(addrs[i])
 		if err != nil {
 			t.Fatalf("unable to create output script: %v", err)
 		}
@@ -1613,13 +1613,13 @@ func testTransactionSubscriptions(miner *rpctest.Harness,
 // scriptFromKey creates a P2WKH script from the given pubkey.
 func scriptFromKey(pubkey *secp256k1.PublicKey) ([]byte, error) {
 	pubkeyHash := dcrutil.Hash160(pubkey.SerializeCompressed())
-	keyAddr, err := dcrutil.NewAddressPubKeyHash(
-		pubkeyHash, chaincfg.SimNetParams(), dcrec.STEcdsaSecp256k1,
+	keyAddr, err := stdaddr.NewAddressPubKeyHashEcdsaSecp256k1V0(
+		pubkeyHash, chaincfg.SimNetParams(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create addr: %v", err)
 	}
-	keyScript, err := txscript.PayToAddrScript(keyAddr)
+	keyScript, err := input.PayToAddrScript(keyAddr)
 	if err != nil {
 		return nil, fmt.Errorf("unable to generate script: %v", err)
 	}
@@ -2057,12 +2057,12 @@ func testSignOutputUsingTweaks(r *rpctest.Harness,
 		// Using the given key for the current iteration, we'll
 		// generate a regular p2wkh from that.
 		pubkeyHash := dcrutil.Hash160(tweakedKey.SerializeCompressed())
-		keyAddr, err := dcrutil.NewAddressPubKeyHash(pubkeyHash,
-			netParams, dcrec.STEcdsaSecp256k1)
+		keyAddr, err := stdaddr.NewAddressPubKeyHashEcdsaSecp256k1V0(pubkeyHash,
+			netParams)
 		if err != nil {
 			t.Fatalf("unable to create addr: %v", err)
 		}
-		keyScript, err := txscript.PayToAddrScript(keyAddr)
+		keyScript, err := input.PayToAddrScript(keyAddr)
 		if err != nil {
 			t.Fatalf("unable to generate script: %v", err)
 		}
@@ -2194,7 +2194,7 @@ func testReorgWalletBalance(r *rpctest.Harness, vw *rpctest.VotingWallet,
 	if err != nil {
 		t.Fatalf("unable to generate address for miner: %v", err)
 	}
-	script, err := txscript.PayToAddrScript(minerAddr)
+	script, err := input.PayToAddrScript(minerAddr)
 	if err != nil {
 		t.Fatalf("unable to create pay to addr script: %v", err)
 	}
@@ -2472,7 +2472,7 @@ func testLastUnusedAddr(miner *rpctest.Harness,
 
 		// Next, we'll have Bob pay to Alice's new address. This should
 		// trigger address rotation at the backend wallet.
-		addrScript, err := txscript.PayToAddrScript(addr1)
+		addrScript, err := input.PayToAddrScript(addr1)
 		if err != nil {
 			t.Fatalf("unable to convert addr to script: %v", err)
 		}
@@ -2566,7 +2566,7 @@ func testCreateSimpleTx(r *rpctest.Harness, // nolint: unused
 				t.Fatalf("unable to generate address for "+
 					"miner: %v", err)
 			}
-			script, err := txscript.PayToAddrScript(minerAddr)
+			script, err := input.PayToAddrScript(minerAddr)
 			if err != nil {
 				t.Fatalf("unable to create pay to addr "+
 					"script: %v", err)
@@ -2908,7 +2908,7 @@ func testSingleFunderExternalFundingTx(miner *rpctest.Harness,
 		LocalAmt: dcrutil.Amount(chanAmt),
 		MinConfs: 1,
 		FeeRate:  1e4,
-		ChangeAddr: func() (dcrutil.Address, error) {
+		ChangeAddr: func() (stdaddr.Address, error) {
 			return alice.NewAddress(lnwallet.PubKeyHash, true)
 		},
 	})
@@ -2953,7 +2953,7 @@ func testSingleFunderExternalFundingTx(miner *rpctest.Harness,
 		LocalAmt: dcrutil.Amount(chanAmt),
 		MinConfs: 1,
 		FeeRate:  1e4,
-		ChangeAddr: func() (dcrutil.Address, error) {
+		ChangeAddr: func() (stdaddr.Address, error) {
 			return bob.NewAddress(lnwallet.PubKeyHash, true)
 		},
 	})

@@ -6,7 +6,7 @@ import (
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4/sign"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/keychain"
@@ -43,7 +43,7 @@ func (s *MockSigner) SignOutputRaw(tx *wire.MsgTx,
 		panic("cannot sign w/ unknown key")
 	}
 
-	sig, err := txscript.RawTxInSignature(
+	sig, err := sign.RawTxInSignature(
 		tx, signDesc.InputIndex,
 		witnessScript, signDesc.HashType, privKey.Serialize(),
 		dcrec.STEcdsaSecp256k1,

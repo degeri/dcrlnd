@@ -7,7 +7,8 @@ import (
 
 	"github.com/decred/dcrd/bech32"
 	"github.com/decred/dcrd/chaincfg/chainhash"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
+
 	"github.com/decred/dcrlnd/lnwire"
 )
 
@@ -175,15 +176,15 @@ func writeTaggedFields(bufferBase32 *bytes.Buffer, invoice *Invoice) error {
 	if invoice.FallbackAddr != nil {
 		var version byte
 		switch invoice.FallbackAddr.(type) {
-		case *dcrutil.AddressPubKeyHash:
+		case *stdaddr.AddressPubKeyHashEcdsaSecp256k1V0:
 			version = 17
-		case *dcrutil.AddressScriptHash:
+		case *stdaddr.AddressScriptHashV0:
 			version = 18
 		default:
 			return fmt.Errorf("unknown fallback address type")
 		}
 		base32Addr, err := bech32.ConvertBits(
-			invoice.FallbackAddr.ScriptAddress(), 8, 5, true)
+			invoice.FallbackAddr.(stdaddr.Hash160er).Hash160()[:], 8, 5, true)
 		if err != nil {
 			return err
 		}

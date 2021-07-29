@@ -9,9 +9,9 @@ import (
 	"os"
 	"testing"
 
-	pb "decred.org/dcrwallet/rpc/walletrpc"
+	pb "decred.org/dcrwallet/v2/rpc/walletrpc"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/rpcclient/v7"
 	"github.com/decred/dcrd/rpctest"
 	"github.com/decred/dcrlnd/internal/testutils"
 )

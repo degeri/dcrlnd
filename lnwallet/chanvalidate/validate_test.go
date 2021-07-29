@@ -8,8 +8,9 @@ import (
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/sign"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwire"
@@ -104,7 +105,7 @@ func newChannelTestCtx(chanSize int64) (*channelTestCtx, error) {
 		},
 	}
 
-	aliceSigRaw, err := txscript.RawTxInSignature(
+	aliceSigRaw, err := sign.RawTxInSignature(
 		commitTx, 0, multiSigScript, txscript.SigHashAll, alicePriv.Serialize(),
 		dcrec.STEcdsaSecp256k1,
 	)
@@ -119,7 +120,7 @@ func newChannelTestCtx(chanSize int64) (*channelTestCtx, error) {
 		return nil, err
 	}
 
-	bobSigRaw, err := txscript.RawTxInSignature(
+	bobSigRaw, err := sign.RawTxInSignature(
 		commitTx, 0, multiSigScript, txscript.SigHashAll, bobPriv.Serialize(),
 		dcrec.STEcdsaSecp256k1,
 	)

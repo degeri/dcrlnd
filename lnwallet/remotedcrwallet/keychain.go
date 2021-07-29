@@ -3,8 +3,8 @@ package remotedcrwallet
 import (
 	"errors"
 
-	"github.com/decred/dcrd/dcrutil/v3"
 	"github.com/decred/dcrd/hdkeychain/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrlnd/channeldb"
 	"github.com/decred/dcrlnd/keychain"
 	"github.com/decred/dcrlnd/lnwallet"
@@ -15,11 +15,11 @@ import (
 type onchainAddrSourcer interface {
 	// NewAddress must return the next usable onchain address for the
 	// wallet.
-	NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Address, error)
+	NewAddress(t lnwallet.AddressType, change bool) (stdaddr.Address, error)
 
 	// Bip44AddressInfo returns the respective account, branch and index
 	// for the given wallet address.
-	Bip44AddressInfo(addr dcrutil.Address) (uint32, uint32, uint32, error)
+	Bip44AddressInfo(addr stdaddr.Address) (uint32, uint32, uint32, error)
 }
 
 // remoteWalletKeyRing is an implementation of both the KeyRing and

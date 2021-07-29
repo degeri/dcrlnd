@@ -3,33 +3,34 @@ module github.com/decred/dcrlnd
 go 1.13
 
 require (
-	decred.org/dcrwallet v1.6.0
+	decred.org/dcrwallet/v2 v2.0.0-20210802144000-f90c236111a4
 	git.schwanenlied.me/yawning/bsaes.git v0.0.0-20180720073208-c0276d75487e // indirect
 	github.com/NebulousLabs/go-upnp v0.0.0-20181203152547-b32978b8ccbf
 	github.com/Yawning/aez v0.0.0-20180408160647-ec7426b44926
 	github.com/btcsuite/btcwallet/walletdb v1.3.3
 	github.com/davecgh/go-spew v1.1.1
-	github.com/decred/dcrd v1.2.1-0.20210121192504-91b84e06447e
+	github.com/decred/dcrd v1.2.1-0.20210804150906-75b0f68a3583
 	github.com/decred/dcrd/bech32 v1.1.1
-	github.com/decred/dcrd/blockchain/stake/v3 v3.0.0
-	github.com/decred/dcrd/blockchain/standalone/v2 v2.0.0
-	github.com/decred/dcrd/blockchain/v3 v3.0.3
-	github.com/decred/dcrd/chaincfg/chainhash v1.0.2
-	github.com/decred/dcrd/chaincfg/v3 v3.0.0
+	github.com/decred/dcrd/blockchain/stake/v4 v4.0.0-20210802141345-893802fc06b0
+	github.com/decred/dcrd/blockchain/standalone/v2 v2.0.1-0.20210802141345-893802fc06b0
+	github.com/decred/dcrd/blockchain/v4 v4.0.0-20210802141345-893802fc06b0
+	github.com/decred/dcrd/chaincfg/chainhash v1.0.3-0.20210802141345-893802fc06b0
+	github.com/decred/dcrd/chaincfg/v3 v3.0.1-0.20210802141345-893802fc06b0
 	github.com/decred/dcrd/connmgr v1.1.0
-	github.com/decred/dcrd/dcrec v1.0.0
+	github.com/decred/dcrd/database/v3 v3.0.0-20210802141345-893802fc06b0 // indirect
+	github.com/decred/dcrd/dcrec v1.0.1-0.20210802141345-893802fc06b0
 	github.com/decred/dcrd/dcrec/secp256k1/v2 v2.0.0
 	github.com/decred/dcrd/dcrec/secp256k1/v3 v3.0.0
-	github.com/decred/dcrd/dcrjson/v3 v3.1.0
-	github.com/decred/dcrd/dcrutil/v3 v3.0.0
-	github.com/decred/dcrd/gcs/v2 v2.1.0
-	github.com/decred/dcrd/hdkeychain/v3 v3.0.0
-	github.com/decred/dcrd/rpc/jsonrpc/types/v2 v2.3.0
-	github.com/decred/dcrd/rpcclient/v6 v6.0.2
-	github.com/decred/dcrd/txscript/v3 v3.0.0
-	github.com/decred/dcrd/wire v1.4.0
+	github.com/decred/dcrd/dcrjson/v3 v3.1.1-0.20210802141345-893802fc06b0
+	github.com/decred/dcrd/dcrutil/v4 v4.0.0-20210802141345-893802fc06b0
+	github.com/decred/dcrd/gcs/v3 v3.0.0-20210525214639-70483c835b7f
+	github.com/decred/dcrd/hdkeychain/v3 v3.0.1-0.20210802141345-893802fc06b0
+	github.com/decred/dcrd/rpc/jsonrpc/types/v3 v3.0.0-20210802141345-893802fc06b0
+	github.com/decred/dcrd/rpcclient/v7 v7.0.0-20210802141345-893802fc06b0
+	github.com/decred/dcrd/txscript/v4 v4.0.0-20210802141345-893802fc06b0
+	github.com/decred/dcrd/wire v1.4.1-0.20210802141345-893802fc06b0
 	github.com/decred/lightning-onion/v3 v3.0.0
-	github.com/decred/slog v1.1.0
+	github.com/decred/slog v1.2.0
 	github.com/go-errors/errors v1.0.1
 	github.com/go-openapi/strfmt v0.19.5 // indirect
 	github.com/golang/protobuf v1.4.2
@@ -61,9 +62,9 @@ require (
 	github.com/urfave/cli v1.20.0
 	gitlab.com/NebulousLabs/fastrand v0.0.0-20181126182046-603482d69e40 // indirect
 	gitlab.com/NebulousLabs/go-upnp v0.0.0-20181011194642-3a71999ed0d3 // indirect
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/net v0.0.0-20200923182212-328152dc79b1
-	golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 	google.golang.org/genproto v0.0.0-20200924141100-a14c0a98937d // indirect

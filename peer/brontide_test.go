@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/channeldb"
 	"github.com/decred/dcrlnd/htlcswitch"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwallet/chancloser"
 	"github.com/decred/dcrlnd/lnwire"
 )
@@ -855,7 +856,7 @@ func TestCustomShutdownScript(t *testing.T) {
 // be a valid address.
 func genScript(t *testing.T, address string) lnwire.DeliveryAddress {
 	// Generate an address which can be used for testing.
-	deliveryAddr, err := dcrutil.DecodeAddress(
+	deliveryAddr, err := stdaddr.DecodeAddress(
 		address,
 		chaincfg.TestNet3Params(),
 	)
@@ -863,7 +864,7 @@ func genScript(t *testing.T, address string) lnwire.DeliveryAddress {
 		t.Fatalf("invalid delivery address: %v", err)
 	}
 
-	script, err := txscript.PayToAddrScript(deliveryAddr)
+	script, err := input.PayToAddrScript(deliveryAddr)
 	if err != nil {
 		t.Fatalf("cannot create script: %v", err)
 	}

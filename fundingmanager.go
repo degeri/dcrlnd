@@ -10,8 +10,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/chanacceptor"
@@ -1379,7 +1378,7 @@ func (f *fundingManager) handleFundingOpen(fmsg *fundingOpenMsg) {
 			if err != nil {
 				return nil, err
 			}
-			return txscript.PayToAddrScript(addr)
+			return input.PayToAddrScript(addr)
 		},
 	)
 	if err != nil {
@@ -1629,7 +1628,7 @@ func (f *fundingManager) handleFundingAccept(fmsg *fundingAcceptMsg) {
 			PendingChanId: pendingChanID[:],
 			Update: &lnrpc.OpenStatusUpdate_PsbtFund{
 				PsbtFund: &lnrpc.ReadyForPsbtFunding{
-					FundingAddress: addr.Address(),
+					FundingAddress: addr.String(),
 					FundingAmount:  amt,
 					Psbt:           buf.Bytes(),
 				},
@@ -3163,7 +3162,7 @@ func (f *fundingManager) handleInitFundingMsg(msg *initFundingMsg) {
 			if err != nil {
 				return nil, err
 			}
-			return txscript.PayToAddrScript(addr)
+			return input.PayToAddrScript(addr)
 		},
 	)
 	if err != nil {

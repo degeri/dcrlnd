@@ -12,14 +12,15 @@ import (
 	"os"
 	"time"
 
-	"decred.org/dcrwallet/wallet/txauthor"
+	"decred.org/dcrwallet/v2/wallet/txauthor"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4/sign"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/channeldb"
@@ -135,7 +136,7 @@ func (m *mockSigner) SignOutputRaw(tx *wire.MsgTx,
 			signDesc.DoubleTweak)
 	}
 
-	sig, err := txscript.RawTxInSignature(tx,
+	sig, err := sign.RawTxInSignature(tx,
 		signDesc.InputIndex, witnessScript, signDesc.HashType,
 		privKey.Serialize(), dcrec.STEcdsaSecp256k1)
 	if err != nil {
@@ -162,7 +163,7 @@ func (m *mockSigner) ComputeInputScript(tx *wire.MsgTx,
 			signDesc.DoubleTweak)
 	}
 
-	sigScript, err := txscript.SignatureScript(tx,
+	sigScript, err := sign.SignatureScript(tx,
 		signDesc.InputIndex, signDesc.Output.PkScript,
 		signDesc.HashType, privKey.Serialize(), dcrec.STEcdsaSecp256k1, true)
 	if err != nil {
@@ -218,19 +219,19 @@ func (*mockWalletController) ConfirmedBalance(confs int32) (dcrutil.Amount,
 }
 
 func (m *mockWalletController) NewAddress(addrType lnwallet.AddressType,
-	change bool) (dcrutil.Address, error) {
+	change bool) (stdaddr.Address, error) {
 
-	return dcrutil.NewAddressSecpPubKeyCompressed(
+	return stdaddr.NewAddressPubKeyEcdsaSecp256k1V0(
 		m.rootKey.PubKey(), chaincfg.RegNetParams())
 }
 
 func (*mockWalletController) LastUnusedAddress(addrType lnwallet.AddressType) (
-	dcrutil.Address, error) {
+	stdaddr.Address, error) {
 
 	return nil, nil
 }
 
-func (*mockWalletController) IsOurAddress(a dcrutil.Address) bool {
+func (*mockWalletController) IsOurAddress(a stdaddr.Address) bool {
 	return false
 }
 

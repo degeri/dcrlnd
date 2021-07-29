@@ -3,7 +3,7 @@ package autopilot
 import (
 	"runtime"
 
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 )
 
 // TopCentrality is a simple greedy technique to create connections to nodes

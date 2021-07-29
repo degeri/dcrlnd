@@ -1,7 +1,7 @@
 package wtserver
 
 import (
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/watchtower/blob"
 	"github.com/decred/dcrlnd/watchtower/wtdb"
 	"github.com/decred/dcrlnd/watchtower/wtpolicy"
@@ -83,7 +83,7 @@ func (s *Server) handleCreateSession(peer Peer, id *wtdb.SessionID,
 
 		// Construct the pkscript the client should pay to when signing
 		// justice transactions for this session.
-		rewardScript, err = txscript.PayToAddrScript(rewardAddress)
+		rewardScript, err = input.PayToAddrScript(rewardAddress)
 		if err != nil {
 			log.Errorf("Unable to generate reward script for "+
 				"%s: %v", id, err)

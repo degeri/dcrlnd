@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
-	"github.com/decred/dcrd/dcrutil/v3"
 	"github.com/decred/dcrd/rpctest"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/chainscan"
@@ -367,7 +367,7 @@ func TestInneficientRescan(t *testing.T) {
 	spendReqTestCases := []struct {
 		name      string
 		spendReq  chainntnfs.SpendRequest
-		addrs     []dcrutil.Address
+		addrs     []stdaddr.Address
 		outpoints []wire.OutPoint
 	}{
 		{
@@ -382,7 +382,7 @@ func TestInneficientRescan(t *testing.T) {
 			spendReq: chainntnfs.SpendRequest{
 				PkScript: pkScript,
 			},
-			addrs: []dcrutil.Address{addr},
+			addrs: []stdaddr.Address{addr},
 		},
 	}
 

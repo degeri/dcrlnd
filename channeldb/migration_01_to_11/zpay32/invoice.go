@@ -7,7 +7,8 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
+
 	"github.com/decred/dcrlnd/lnwire"
 )
 
@@ -180,7 +181,7 @@ type Invoice struct {
 	// FallbackAddr is an on-chain address that can be used for payment in
 	// case the Lightning payment fails.
 	// Optional.
-	FallbackAddr dcrutil.Address
+	FallbackAddr stdaddr.Address
 
 	// RouteHints represents one or more different route hints. Each route
 	// hint can be individually used to reach the destination. These usually
@@ -251,7 +252,7 @@ func Expiry(expiry time.Duration) func(*Invoice) {
 // FallbackAddr is a functional option that allows callers of NewInvoice to set
 // the Invoice's fallback on-chain address that can be used for payment in case
 // the Lightning payment fails
-func FallbackAddr(fallbackAddr dcrutil.Address) func(*Invoice) {
+func FallbackAddr(fallbackAddr stdaddr.Address) func(*Invoice) {
 	return func(i *Invoice) {
 		i.FallbackAddr = fallbackAddr
 	}

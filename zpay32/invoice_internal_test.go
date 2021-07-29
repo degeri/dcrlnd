@@ -10,7 +10,7 @@ import (
 	"github.com/decred/dcrd/bech32"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrlnd/lnwire"
 )
 
@@ -580,20 +580,20 @@ func TestParseMaxUint64Expiry(t *testing.T) {
 func TestParseFallbackAddr(t *testing.T) {
 	t.Parallel()
 
-	testAddrTestnetData, _ := bech32.ConvertBits(testAddrTestnet.ScriptAddress(), 8, 5, true)
+	testAddrTestnetData, _ := bech32.ConvertBits(testAddrTestnet.(stdaddr.Hash160er).Hash160()[:], 8, 5, true)
 	testAddrTestnetDataWithVersion := append([]byte{17}, testAddrTestnetData...)
 
-	testRustyAddrData, _ := bech32.ConvertBits(testRustyAddr.ScriptAddress(), 8, 5, true)
+	testRustyAddrData, _ := bech32.ConvertBits(testRustyAddr.(stdaddr.Hash160er).Hash160()[:], 8, 5, true)
 	testRustyAddrDataWithVersion := append([]byte{17}, testRustyAddrData...)
 
-	testAddrMainnetP2SHData, _ := bech32.ConvertBits(testAddrMainnetP2SH.ScriptAddress(), 8, 5, true)
+	testAddrMainnetP2SHData, _ := bech32.ConvertBits(testAddrMainnetP2SH.(stdaddr.Hash160er).Hash160()[:], 8, 5, true)
 	testAddrMainnetP2SHDataWithVersion := append([]byte{18}, testAddrMainnetP2SHData...)
 
 	tests := []struct {
 		data   []byte
 		net    *chaincfg.Params
 		valid  bool
-		result dcrutil.Address
+		result stdaddr.Address
 	}{
 		{
 			data:  []byte{},

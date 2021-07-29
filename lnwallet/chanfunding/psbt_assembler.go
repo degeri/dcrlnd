@@ -5,11 +5,12 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"sync"
 
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/internal/psbt"
@@ -162,7 +163,7 @@ func (i *PsbtIntent) BindKeys(localKey *keychain.KeyDescriptor,
 // channel output this intent was created for. It returns the P2WSH funding
 // address, the exact funding amount and a PSBT packet that contains exactly one
 // output that encodes the previous two parameters.
-func (i *PsbtIntent) FundingParams() (dcrutil.Address, int64, *psbt.Packet,
+func (i *PsbtIntent) FundingParams() (stdaddr.Address, int64, *psbt.Packet,
 	error) {
 
 	if i.State != PsbtOutputKnown {
@@ -181,7 +182,7 @@ func (i *PsbtIntent) FundingParams() (dcrutil.Address, int64, *psbt.Packet,
 	witnessScriptHash := sha256.Sum256(witnessScript)
 
 	// Encode the address in the human readable bech32 format.
-	addr, err := dcrutil.NewAddressScriptHash(
+	addr, err := stdaddr.NewAddressScriptHashV0(
 		witnessScriptHash[:], i.netParams,
 	)
 	if err != nil {

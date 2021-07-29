@@ -7,11 +7,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrec"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
 )
 
 const (
@@ -129,21 +130,21 @@ func (s PkScript) Script() []byte {
 }
 
 // Address encodes the script into an address for the given chain.
-func (s PkScript) Address(chainParams *chaincfg.Params) (dcrutil.Address, error) {
+func (s PkScript) Address(chainParams *chaincfg.Params) (stdaddr.Address, error) {
 	var (
-		address dcrutil.Address
+		address stdaddr.Address
 		err     error
 	)
 
 	switch s.class {
 	case txscript.PubKeyHashTy:
 		scriptHash := s.script[3:23]
-		address, err = dcrutil.NewAddressPubKeyHash(
-			scriptHash, chainParams, dcrec.STEcdsaSecp256k1,
+		address, err = stdaddr.NewAddressPubKeyHashEcdsaSecp256k1V0(
+			scriptHash, chainParams,
 		)
 	case txscript.ScriptHashTy:
 		scriptHash := s.script[1:21]
-		address, err = dcrutil.NewAddressScriptHashFromHash(
+		address, err = stdaddr.NewAddressScriptHashV0FromHash(
 			scriptHash, chainParams,
 		)
 	default:

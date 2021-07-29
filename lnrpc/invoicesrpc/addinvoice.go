@@ -11,7 +11,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 
 	"github.com/decred/dcrlnd/channeldb"
@@ -181,7 +182,7 @@ func AddInvoice(ctx context.Context, cfg *AddInvoiceConfig,
 
 	// If specified, add a fallback address to the payment request.
 	if len(invoice.FallbackAddr) > 0 {
-		addr, err := dcrutil.DecodeAddress(
+		addr, err := stdaddr.DecodeAddress(
 			invoice.FallbackAddr, cfg.ChainParams,
 		)
 		if err != nil {

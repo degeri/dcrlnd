@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/lnwallet"
 	"github.com/decred/dcrlnd/lnwallet/chainfee"
@@ -168,7 +168,7 @@ var sweepScript = []byte{
 	0x0e, 0x6e, 0xf8, 0xef, 0x20, 0x88, 0xac,
 }
 
-var deliveryAddr = func() dcrutil.Address {
+var deliveryAddr = func() stdaddr.Address {
 	_, addrs, _, err := txscript.ExtractPkScriptAddrs(
 		0, sweepScript, chaincfg.TestNet3Params(), false,
 	)

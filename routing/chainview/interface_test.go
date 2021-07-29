@@ -13,13 +13,16 @@ import (
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrjson/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/rpcclient/v6"
-	rpcclient3 "github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/rpcclient/v7"
+	rpcclient3 "github.com/decred/dcrd/rpcclient/v7"
 	"github.com/decred/dcrd/rpctest"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/sign"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/channeldb"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/internal/testutils"
 )
 
@@ -35,11 +38,11 @@ var (
 
 	privKey   = secp256k1.PrivKeyFromBytes(testPrivKey)
 	pubKey    = privKey.PubKey()
-	addrPk, _ = dcrutil.NewAddressSecpPubKeyCompressed(pubKey,
+	addrPk, _ = stdaddr.NewAddressPubKeyEcdsaSecp256k1V0(pubKey,
 		netParams)
 	testAddr = addrPk.AddressPubKeyHash()
 
-	testScript, _ = txscript.PayToAddrScript(testAddr)
+	testScript, _ = input.PayToAddrScript(testAddr)
 )
 
 func waitForMempoolTx(r *rpctest.Harness, txid *chainhash.Hash) error {
@@ -76,7 +79,7 @@ func waitForMempoolTx(r *rpctest.Harness, txid *chainhash.Hash) error {
 }
 
 func getTestTXID(miner *rpctest.Harness) (*chainhash.Hash, error) {
-	script, err := txscript.PayToAddrScript(testAddr)
+	script, err := input.PayToAddrScript(testAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +115,7 @@ func craftSpendTransaction(outpoint wire.OutPoint, payScript []byte) (*wire.MsgT
 		Value:    1e8,
 		PkScript: payScript,
 	})
-	sigScript, err := txscript.SignatureScript(spendingTx, 0, payScript,
+	sigScript, err := sign.SignatureScript(spendingTx, 0, payScript,
 		txscript.SigHashAll, privKey.Serialize(), dcrec.STEcdsaSecp256k1, true)
 	if err != nil {
 		return nil, err
@@ -213,7 +216,7 @@ func testFilterBlockNotifications(node *rpctest.Harness,
 		t.Fatalf("unable to fetch transaction: %v", err)
 	}
 
-	targetScript, err := txscript.PayToAddrScript(testAddr)
+	targetScript, err := input.PayToAddrScript(testAddr)
 	if err != nil {
 		t.Fatalf("unable to create target output: %v", err)
 	}

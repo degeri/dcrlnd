@@ -11,8 +11,8 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/keychain"
@@ -56,12 +56,12 @@ var (
 	}
 
 	// addr is the server's reward address given to watchtower clients.
-	addr, _ = dcrutil.DecodeAddress(
+	addr, _ = stdaddr.DecodeAddress(
 		"Tsi6gGYNSMmFwi7JoL5Li39SrERZTTMu6vY",
 		chaincfg.TestNet3Params(),
 	)
 
-	addrScript, _ = txscript.PayToAddrScript(addr)
+	addrScript, _ = input.PayToAddrScript(addr)
 )
 
 // randPrivKey generates a new secp keypair, and returns the public key.
@@ -420,7 +420,7 @@ func newHarness(t *testing.T, cfg harnessCfg) *testHarness {
 		ReadTimeout:  timeout,
 		WriteTimeout: timeout,
 		NodeKeyECDH:  privKeyECDH,
-		NewAddress: func() (dcrutil.Address, error) {
+		NewAddress: func() (stdaddr.Address, error) {
 			return addr, nil
 		},
 		NoAckCreateSession: cfg.noAckCreateSession,

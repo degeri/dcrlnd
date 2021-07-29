@@ -10,8 +10,9 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/keychain"
@@ -251,12 +252,12 @@ var (
 
 	blobTypeCommitReward = (blob.FlagCommitOutputs | blob.FlagReward).Type()
 
-	addr, _ = dcrutil.DecodeAddress(
+	addr, _ = stdaddr.DecodeAddress(
 		"Tsi6gGYNSMmFwi7JoL5Li39SrERZTTMu6vY",
 		chaincfg.TestNet3Params(),
 	)
 
-	addrScript, _ = txscript.PayToAddrScript(addr)
+	addrScript, _ = input.PayToAddrScript(addr)
 )
 
 // TestBackupTaskBind tests the initialization and binding of a backupTask to a

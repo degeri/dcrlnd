@@ -11,10 +11,11 @@ import (
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrjson/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	jsontypes "github.com/decred/dcrd/rpc/jsonrpc/types/v2"
-	"github.com/decred/dcrd/rpcclient/v6"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	jsontypes "github.com/decred/dcrd/rpc/jsonrpc/types/v3"
+	"github.com/decred/dcrd/rpcclient/v7"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/chainscan"
@@ -735,7 +736,7 @@ func (n *DcrdNotifier) RegisterSpendNtfn(outpoint *wire.OutPoint,
 	// We'll then request the backend to notify us when it has detected the
 	// outpoint or a script was spent.
 	var ops []wire.OutPoint
-	var addrs []dcrutil.Address
+	var addrs []stdaddr.Address
 
 	// Otherwise, we'll determine when the output was spent by scanning the
 	// chain.  We'll begin by determining where to start our historical
@@ -769,7 +770,7 @@ func (n *DcrdNotifier) RegisterSpendNtfn(outpoint *wire.OutPoint,
 		// the outpoint has been spent. If it hasn't, we can return to the
 		// caller as well.
 		txOut, err := n.chainConn.GetTxOut(
-			context.TODO(), &outpoint.Hash, outpoint.Index, true,
+			context.TODO(), &outpoint.Hash, outpoint.Index, outpoint.Tree, true,
 		)
 		if err != nil {
 			return nil, err
@@ -847,7 +848,7 @@ func (n *DcrdNotifier) RegisterSpendNtfn(outpoint *wire.OutPoint,
 // txSpendsSpendRequest returns the index where the given spendRequest was
 // spent by the transaction or -1 if no inputs spend the given spendRequest.
 func txSpendsSpendRequest(tx *wire.MsgTx, spendRequest *chainntnfs.SpendRequest,
-	addrParams dcrutil.AddressParams) int {
+	addrParams stdaddr.AddressParams) int {
 
 	if spendRequest.OutPoint != chainntnfs.ZeroOutPoint {
 		// Matching by outpoint.

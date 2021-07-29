@@ -15,10 +15,10 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/gcs/v2"
-	"github.com/decred/dcrd/rpcclient/v6"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/gcs/v3"
+	"github.com/decred/dcrd/rpcclient/v7"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainscan"
 	"github.com/jessevdk/go-flags"
@@ -160,15 +160,12 @@ func main() {
 
 	var targets []chainscan.TargetAndOptions
 	for _, t := range opts.Targets {
-		addr, err := dcrutil.DecodeAddress(t, params)
+		addr, err := stdaddr.DecodeAddress(t, params)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		script, err := txscript.PayToAddrScript(addr)
-		if err != nil {
-			log.Fatal(err)
-		}
+		scriptVer, script := addr.PaymentScript()
 
 		foundCb := func(e chainscan.Event, findMore chainscan.FindFunc) {
 			outp := wire.OutPoint{
@@ -185,7 +182,7 @@ func main() {
 					es.Tx.TxHash(), es.Index)
 			}
 			findMore(
-				chainscan.SpentOutPoint(outp, 0, script),
+				chainscan.SpentOutPoint(outp, scriptVer, script),
 				chainscan.WithFoundCallback(foundSpendCb),
 				chainscan.WithEndHeight(int32(bestHeight)),
 			)

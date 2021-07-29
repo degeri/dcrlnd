@@ -16,7 +16,7 @@ func RPCTransactionDetails(txns []*lnwallet.TransactionDetail) *TransactionDetai
 	for i, tx := range txns {
 		var destAddresses []string
 		for _, destAddress := range tx.DestAddresses {
-			destAddresses = append(destAddresses, destAddress.Address())
+			destAddresses = append(destAddresses, destAddress.String())
 		}
 
 		// We also get unconfirmed transactions, so BlockHash can be

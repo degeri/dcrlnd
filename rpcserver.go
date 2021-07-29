@@ -18,14 +18,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"decred.org/dcrwallet/wallet/txauthor"
+	"decred.org/dcrwallet/v2/wallet/txauthor"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/autopilot"
 	"github.com/decred/dcrlnd/build"
@@ -991,12 +992,12 @@ func (r *rpcServer) Stop() error {
 func addrPairsToOutputs(addrPairs map[string]int64, netParams *chaincfg.Params) ([]*wire.TxOut, error) {
 	outputs := make([]*wire.TxOut, 0, len(addrPairs))
 	for addr, amt := range addrPairs {
-		addr, err := dcrutil.DecodeAddress(addr, netParams)
+		addr, err := stdaddr.DecodeAddress(addr, netParams)
 		if err != nil {
 			return nil, err
 		}
 
-		pkscript, err := txscript.PayToAddrScript(addr)
+		pkscript, err := input.PayToAddrScript(addr)
 		if err != nil {
 			return nil, err
 		}
@@ -1207,7 +1208,7 @@ func (r *rpcServer) SendCoins(ctx context.Context,
 
 	// Decode the address receiving the coins, we need to check whether the
 	// address is valid for this network.
-	targetAddr, err := dcrutil.DecodeAddress(in.Addr, activeNetParams.Params)
+	targetAddr, err := stdaddr.DecodeAddress(in.Addr, activeNetParams.Params)
 	if err != nil {
 		return nil, err
 	}
@@ -1367,7 +1368,7 @@ func (r *rpcServer) NewAddress(ctx context.Context,
 	// Translate the gRPC proto address type to the wallet controller's
 	// available address types.
 	var (
-		addr dcrutil.Address
+		addr stdaddr.Address
 		err  error
 	)
 	switch in.Type {
@@ -2057,14 +2058,14 @@ func parseUpfrontShutdownAddress(address string) (lnwire.DeliveryAddress, error)
 		return nil, nil
 	}
 
-	addr, err := dcrutil.DecodeAddress(
+	addr, err := stdaddr.DecodeAddress(
 		address, activeNetParams.Params,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("invalid address: %v", err)
 	}
 
-	return txscript.PayToAddrScript(addr)
+	return input.PayToAddrScript(addr)
 }
 
 // GetChanPointFundingTxid returns the given channel point's funding txid in
@@ -2272,7 +2273,7 @@ func (r *rpcServer) CloseChannel(in *lnrpc.CloseChannelRequest,
 		// If a delivery address to close out to was specified, decode it.
 		if len(in.DeliveryAddress) > 0 {
 			// Decode the address provided.
-			addr, err := dcrutil.DecodeAddress(
+			addr, err := stdaddr.DecodeAddress(
 				in.DeliveryAddress, activeNetParams.Params,
 			)
 			if err != nil {
@@ -2280,7 +2281,7 @@ func (r *rpcServer) CloseChannel(in *lnrpc.CloseChannelRequest,
 			}
 
 			// Create a script to pay out to the address provided.
-			deliveryScript, err = txscript.PayToAddrScript(addr)
+			deliveryScript, err = input.PayToAddrScript(addr)
 			if err != nil {
 				return err
 			}
@@ -5051,7 +5052,7 @@ func (r *rpcServer) SubscribeTransactions(req *lnrpc.GetTransactionsRequest,
 		case tx := <-txClient.ConfirmedTransactions():
 			destAddresses := make([]string, 0, len(tx.DestAddresses))
 			for _, destAddress := range tx.DestAddresses {
-				destAddresses = append(destAddresses, destAddress.Address())
+				destAddresses = append(destAddresses, destAddress.String())
 			}
 			detail := &lnrpc.Transaction{
 				TxHash:           tx.Hash.String(),
@@ -5071,7 +5072,7 @@ func (r *rpcServer) SubscribeTransactions(req *lnrpc.GetTransactionsRequest,
 		case tx := <-txClient.UnconfirmedTransactions():
 			var destAddresses []string
 			for _, destAddress := range tx.DestAddresses {
-				destAddresses = append(destAddresses, destAddress.Address())
+				destAddresses = append(destAddresses, destAddress.String())
 			}
 			detail := &lnrpc.Transaction{
 				TxHash:        tx.Hash.String(),

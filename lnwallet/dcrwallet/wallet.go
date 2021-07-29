@@ -12,16 +12,17 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 
 	"github.com/decred/dcrlnd/lnwallet"
 	"github.com/decred/dcrlnd/lnwallet/chainfee"
 
-	base "decred.org/dcrwallet/wallet"
-	"decred.org/dcrwallet/wallet/txauthor"
-	"decred.org/dcrwallet/wallet/udb"
+	base "decred.org/dcrwallet/v2/wallet"
+	"decred.org/dcrwallet/v2/wallet/txauthor"
+	"decred.org/dcrwallet/v2/wallet/udb"
 	walletloader "github.com/decred/dcrlnd/lnwallet/dcrwallet/loader"
 )
 
@@ -220,7 +221,7 @@ func (b *DcrWallet) ConfirmedBalance(confs int32) (dcrutil.Amount, error) {
 // returned.
 //
 // This is a part of the WalletController interface.
-func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Address, error) {
+func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (stdaddr.Address, error) {
 
 	switch t {
 	case lnwallet.PubKeyHash:
@@ -229,7 +230,7 @@ func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Add
 		return nil, fmt.Errorf("unknown address type")
 	}
 
-	var addr dcrutil.Address
+	var addr stdaddr.Address
 	var err error
 	if change {
 		addr, err = b.wallet.NewInternalAddress(context.TODO(), defaultAccount)
@@ -242,9 +243,9 @@ func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Add
 	}
 
 	// Convert to a regular p2pkh address, since the addresses returned are
-	// used as paramaters to PayToScriptAddress() which doesn't understand
+	// used as paramaters to PayT.(stdaddr.Hash160er).Hash160()[:] which doesn't understand
 	// the native wallet types.
-	return dcrutil.DecodeAddress(addr.Address(), b.netParams)
+	return stdaddr.DecodeAddress(addr.String(), b.netParams)
 }
 
 // LastUnusedAddress returns the last *unused* address known by the wallet. An
@@ -254,7 +255,7 @@ func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Add
 // NewAddress it can derive a specified address type, and also optionally a
 // change address.
 func (b *DcrWallet) LastUnusedAddress(addrType lnwallet.AddressType) (
-	dcrutil.Address, error) {
+	stdaddr.Address, error) {
 
 	switch addrType {
 	case lnwallet.PubKeyHash:
@@ -262,14 +263,18 @@ func (b *DcrWallet) LastUnusedAddress(addrType lnwallet.AddressType) (
 	default:
 		return nil, fmt.Errorf("unknown address type")
 	}
+	a, err := b.wallet.CurrentAddress(defaultAccount)
+	if err != nil {
+		return nil, err
+	}
 
-	return b.wallet.CurrentAddress(defaultAccount)
+	return a, nil
 }
 
 // IsOurAddress checks if the passed address belongs to this wallet
 //
 // This is a part of the WalletController interface.
-func (b *DcrWallet) IsOurAddress(a dcrutil.Address) bool {
+func (b *DcrWallet) IsOurAddress(a stdaddr.Address) bool {
 	result, err := b.wallet.HaveAddress(context.TODO(), a)
 	return result && (err == nil)
 }
@@ -576,7 +581,7 @@ func minedTransactionsToDetails(
 			return nil, err
 		}
 
-		var destAddresses []dcrutil.Address
+		var destAddresses []stdaddr.Address
 		for _, txOut := range wireTx.TxOut {
 			_, outAddresses, _, err := txscript.ExtractPkScriptAddrs(
 				txOut.Version, txOut.PkScript, chainParams, false)
@@ -626,7 +631,7 @@ func unminedTransactionsToDetail(
 		return nil, err
 	}
 
-	var destAddresses []dcrutil.Address
+	var destAddresses []stdaddr.Address
 	for _, txOut := range wireTx.TxOut {
 		_, outAddresses, _, err :=
 			txscript.ExtractPkScriptAddrs(txOut.Version,

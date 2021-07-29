@@ -11,12 +11,12 @@ import (
 	"github.com/decred/dcrlnd/keychain"
 	"github.com/decred/dcrlnd/lnwallet"
 
-	base "decred.org/dcrwallet/wallet"
+	base "decred.org/dcrwallet/v2/wallet"
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
 	"github.com/decred/dcrd/hdkeychain/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	walletloader "github.com/decred/dcrlnd/lnwallet/dcrwallet/loader"
 )
 
@@ -33,8 +33,8 @@ type mockOnchainAddrSourcer struct {
 	w *base.Wallet
 }
 
-func (mas *mockOnchainAddrSourcer) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Address, error) {
-	var addr dcrutil.Address
+func (mas *mockOnchainAddrSourcer) NewAddress(t lnwallet.AddressType, change bool) (stdaddr.Address, error) {
+	var addr stdaddr.Address
 	var err error
 	if change {
 		addr, err = mas.w.NewInternalAddress(context.TODO(), 0)
@@ -47,12 +47,12 @@ func (mas *mockOnchainAddrSourcer) NewAddress(t lnwallet.AddressType, change boo
 	}
 
 	// Convert to a regular p2pkh address, since the addresses returned are
-	// used as paramaters to PayToScriptAddress() which doesn't understand
+	// used as paramaters to PayT.(stdaddr.Hash160er).Hash160()[:] which doesn't understand
 	// the native wallet types.
-	return dcrutil.DecodeAddress(addr.Address(), chaincfg.SimNetParams())
+	return stdaddr.DecodeAddress(addr.String(), chaincfg.SimNetParams())
 
 }
-func (mas *mockOnchainAddrSourcer) Bip44AddressInfo(addr dcrutil.Address) (uint32, uint32, uint32, error) {
+func (mas *mockOnchainAddrSourcer) Bip44AddressInfo(addr stdaddr.Address) (uint32, uint32, uint32, error) {
 	info, err := mas.w.KnownAddress(context.Background(), addr)
 	if err != nil {
 		return 0, 0, 0, nil

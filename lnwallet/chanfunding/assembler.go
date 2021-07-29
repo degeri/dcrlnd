@@ -1,7 +1,8 @@
 package chanfunding
 
 import (
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/lnwallet/chainfee"
 )
@@ -77,7 +78,7 @@ type Request struct {
 
 	// ChangeAddr is a closure that will provide the Assembler with a
 	// change address for the funding transaction if needed.
-	ChangeAddr func() (dcrutil.Address, error)
+	ChangeAddr func() (stdaddr.Address, error)
 }
 
 // Intent is returned by an Assembler and represents the base functionality the

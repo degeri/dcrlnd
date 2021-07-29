@@ -1,11 +1,11 @@
 package wtclient
 
 import (
-	"github.com/decred/dcrd/blockchain/v3"
+	"github.com/decred/dcrd/blockchain/v4"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/dcrutil/v3/txsort"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/dcrutil/v4/txsort"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwallet"
@@ -232,7 +232,7 @@ func (t *backupTask) craftSessionPayload(
 
 	// Check that the justice transaction meets basic validity requirements
 	// before attempting to attach the witnesses.
-	if err := blockchain.CheckTransactionSanity(justiceTxn, t.chainParams, false); err != nil {
+	if err := blockchain.CheckTransactionSanity(justiceTxn, t.chainParams); err != nil {
 		return hint, nil, err
 	}
 

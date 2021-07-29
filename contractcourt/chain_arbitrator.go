@@ -9,7 +9,7 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/channeldb"
@@ -111,7 +111,7 @@ type ChainArbitratorConfig struct {
 	// IsOurAddress is a function that returns true if the passed address
 	// is known to the underlying wallet. Otherwise, false should be
 	// returned.
-	IsOurAddress func(dcrutil.Address) bool
+	IsOurAddress func(stdaddr.Address) bool
 
 	// IncubateOutput sends either an incoming HTLC, an outgoing HTLC, or
 	// both to the utxo nursery. Once this function returns, the nursery

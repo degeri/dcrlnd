@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/rpcclient/v7"
 	"github.com/decred/dcrd/rpctest"
 )
 
@@ -43,4 +43,8 @@ func NewSetupRPCTest(t *testing.T, maxTries int, netParams *chaincfg.Params,
 	}
 
 	return nil, err
+}
+
+func init() {
+	rpctest.SetPathToDCRD("dcrd-dcrlnd")
 }

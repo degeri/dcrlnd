@@ -7,7 +7,7 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/keychain"
 	"github.com/decred/dcrlnd/tor"
@@ -66,7 +66,7 @@ type Config struct {
 
 	// NewAddress is used to generate reward addresses, where a cut of
 	// successfully sent funds can be received.
-	NewAddress func() (dcrutil.Address, error)
+	NewAddress func() (stdaddr.Address, error)
 
 	// NodeKeyECDH is the ECDH capable wrapper of the key to be used in
 	// accepting new brontide connections.

@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"decred.org/dcrwallet/rpc/walletrpc"
+	"decred.org/dcrwallet/v2/rpc/walletrpc"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/gcs/v2"
+	"github.com/decred/dcrd/gcs/v3"
 	"github.com/decred/dcrd/rpctest"
 	"github.com/decred/dcrlnd/chainscan"
 	"github.com/decred/dcrlnd/internal/testutils"

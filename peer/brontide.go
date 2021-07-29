@@ -14,7 +14,6 @@ import (
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/connmgr"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/txscript/v3"
 	"github.com/decred/dcrd/wire"
 
 	"github.com/decred/dcrlnd/brontide"
@@ -25,6 +24,7 @@ import (
 	"github.com/decred/dcrlnd/contractcourt"
 	"github.com/decred/dcrlnd/feature"
 	"github.com/decred/dcrlnd/htlcswitch"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnpeer"
 	"github.com/decred/dcrlnd/lnwallet"
 	"github.com/decred/dcrlnd/lnwallet/chancloser"
@@ -1805,7 +1805,7 @@ func (p *Brontide) genDeliveryScript() ([]byte, error) {
 	peerLog.Infof("Delivery addr for channel close: %v",
 		deliveryAddr)
 
-	return txscript.PayToAddrScript(deliveryAddr)
+	return input.PayToAddrScript(deliveryAddr)
 }
 
 // channelManager is goroutine dedicated to handling all requests/signals

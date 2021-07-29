@@ -17,12 +17,13 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrd/rpctest"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 
 	"github.com/decred/dcrlnd"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/internal/testutils"
 	"github.com/decred/dcrlnd/lnrpc"
 	"github.com/decred/dcrlnd/lntest/wait"
@@ -208,11 +209,11 @@ func (n *NetworkHarness) SetUp(lndArgs []string) error {
 			if err != nil {
 				return err
 			}
-			addr, err := dcrutil.DecodeAddress(resp.Address, n.netParams)
+			addr, err := stdaddr.DecodeAddress(resp.Address, n.netParams)
 			if err != nil {
 				return err
 			}
-			addrScript, err := txscript.PayToAddrScript(addr)
+			addrScript, err := input.PayToAddrScript(addr)
 			if err != nil {
 				return err
 			}
@@ -1369,11 +1370,11 @@ func (n *NetworkHarness) sendCoins(ctx context.Context, amt dcrutil.Amount,
 	if err != nil {
 		return err
 	}
-	addr, err := dcrutil.DecodeAddress(resp.Address, n.netParams)
+	addr, err := stdaddr.DecodeAddress(resp.Address, n.netParams)
 	if err != nil {
 		return err
 	}
-	addrScript, err := txscript.PayToAddrScript(addr)
+	addrScript, err := input.PayToAddrScript(addr)
 	if err != nil {
 		return err
 	}
@@ -1527,4 +1528,8 @@ func CopyFile(dest, src string) error {
 	}
 
 	return d.Close()
+}
+
+func init() {
+	rpctest.SetPathToDCRD("dcrd-dcrlnd")
 }

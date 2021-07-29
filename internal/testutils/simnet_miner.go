@@ -11,7 +11,7 @@ import (
 
 	"github.com/decred/dcrd/blockchain/standalone/v2"
 	"github.com/decred/dcrd/chaincfg/chainhash"
-	"github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/rpcclient/v7"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/lntest/wait"
 )

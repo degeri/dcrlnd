@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
-	jsontypes "github.com/decred/dcrd/rpc/jsonrpc/types/v2"
-	"github.com/decred/dcrd/rpcclient/v6"
+	jsontypes "github.com/decred/dcrd/rpc/jsonrpc/types/v3"
+	"github.com/decred/dcrd/rpcclient/v7"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/channeldb"
 )

@@ -3,11 +3,11 @@ package lnwallet
 import (
 	"fmt"
 
-	"github.com/decred/dcrd/blockchain/v3"
+	"github.com/decred/dcrd/blockchain/v4"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/channeldb"
 	"github.com/decred/dcrlnd/input"
@@ -550,7 +550,7 @@ func (cb *CommitmentBuilder) createUnsignedCommitmentTx(ourBalance,
 
 	// Next, we'll ensure that we don't accidentally create a commitment
 	// transaction which would be invalid by consensus.
-	if err := blockchain.CheckTransactionSanity(commitTx, cb.netParams, false); err != nil {
+	if err := blockchain.CheckTransactionSanity(commitTx, cb.netParams); err != nil {
 		return nil, err
 	}
 

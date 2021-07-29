@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/decred/dcrd/dcrutil/v3"
-	dcrjson "github.com/decred/dcrd/rpc/jsonrpc/types/v2"
-	"github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/dcrutil/v4"
+	dcrjson "github.com/decred/dcrd/rpc/jsonrpc/types/v3"
+	"github.com/decred/dcrd/rpcclient/v7"
 )
 
 const (
@@ -246,7 +246,7 @@ func (b *DcrdEstimator) fetchEstimate(confTarget uint32) (AtomPerKByte, error) {
 
 	// Next, we'll convert the returned value to atoms, as it's
 	// currently returned in DCR.
-	atoms, err := dcrutil.NewAmount(dcrPerKB)
+	atoms, err := dcrutil.NewAmount(dcrPerKB.FeeRate)
 	if err != nil {
 		return 0, err
 	}

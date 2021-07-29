@@ -10,10 +10,10 @@ import (
 	"github.com/decred/dcrd/bech32"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
+
 	"github.com/decred/dcrlnd/lnwire"
 )
 
@@ -376,13 +376,13 @@ func parseMinFinalCLTVExpiry(data []byte) (*uint64, error) {
 
 // parseFallbackAddr converts the data (encoded in base32) into a fallback
 // on-chain address.
-func parseFallbackAddr(data []byte, net *chaincfg.Params) (dcrutil.Address, error) {
+func parseFallbackAddr(data []byte, net *chaincfg.Params) (stdaddr.Address, error) {
 	// Checks if the data is empty or contains a version without an address.
 	if len(data) < 2 {
 		return nil, fmt.Errorf("empty fallback address field")
 	}
 
-	var addr dcrutil.Address
+	var addr stdaddr.Address
 
 	version := data[0]
 	switch version {
@@ -394,7 +394,7 @@ func parseFallbackAddr(data []byte, net *chaincfg.Params) (dcrutil.Address, erro
 			return nil, err
 		}
 
-		addr, err = dcrutil.NewAddressPubKeyHash(pubKeyHash, net, dcrec.STEcdsaSecp256k1)
+		addr, err = stdaddr.NewAddressPubKeyHashEcdsaSecp256k1V0(pubKeyHash, net)
 		if err != nil {
 			return nil, err
 		}
@@ -404,7 +404,7 @@ func parseFallbackAddr(data []byte, net *chaincfg.Params) (dcrutil.Address, erro
 			return nil, err
 		}
 
-		addr, err = dcrutil.NewAddressScriptHashFromHash(scriptHash, net)
+		addr, err = stdaddr.NewAddressScriptHashV0FromHash(scriptHash, net)
 		if err != nil {
 			return nil, err
 		}

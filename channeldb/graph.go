@@ -15,10 +15,11 @@ import (
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/channeldb/kvdb"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwire"
 	"github.com/decred/dcrlnd/routing/route"
 )
@@ -3100,8 +3101,7 @@ func genMultiSigP2SH(aPub, bPub []byte) ([]byte, error) {
 	// With the witness script generated, we'll now turn it into a p2sh
 	// script:
 	//  * OP_HASH160 <HASH160(script)> OP_EQUAL
-	sh := dcrutil.Hash160(witnessScript)
-	return txscript.PayToScriptHashScript(sh)
+	return input.ScriptHashPkScript(witnessScript)
 }
 
 // EdgePoint couples the outpoint of a channel with the funding script that it

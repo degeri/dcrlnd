@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrlnd/channeldb"
 	"github.com/decred/dcrlnd/clock"
 	"github.com/decred/dcrlnd/htlcswitch"

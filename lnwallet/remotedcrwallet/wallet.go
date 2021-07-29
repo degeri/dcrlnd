@@ -11,16 +11,18 @@ import (
 	"sync/atomic"
 	"time"
 
-	pb "decred.org/dcrwallet/rpc/walletrpc"
+	pb "decred.org/dcrwallet/v2/rpc/walletrpc"
 	"google.golang.org/grpc"
 
-	"decred.org/dcrwallet/wallet/txauthor"
+	"decred.org/dcrwallet/v2/wallet/txauthor"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrd/hdkeychain/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/sign"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/channeldb"
 	"github.com/decred/dcrlnd/lnwallet"
@@ -232,7 +234,7 @@ func (b *DcrWallet) ConfirmedBalance(confs int32) (dcrutil.Amount, error) {
 // returned.
 //
 // This is a part of the WalletController interface.
-func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Address, error) {
+func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (stdaddr.Address, error) {
 
 	switch t {
 	case lnwallet.PubKeyHash:
@@ -255,7 +257,7 @@ func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Add
 		return nil, err
 	}
 
-	addr, err := dcrutil.DecodeAddress(resp.Address, b.chainParams)
+	addr, err := stdaddr.DecodeAddress(resp.Address, b.chainParams)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +271,7 @@ func (b *DcrWallet) NewAddress(t lnwallet.AddressType, change bool) (dcrutil.Add
 // NewAddress it can derive a specified address type, and also optionally a
 // change address.
 func (b *DcrWallet) LastUnusedAddress(addrType lnwallet.AddressType) (
-	dcrutil.Address, error) {
+	stdaddr.Address, error) {
 
 	switch addrType {
 	case lnwallet.PubKeyHash:
@@ -284,9 +286,9 @@ func (b *DcrWallet) LastUnusedAddress(addrType lnwallet.AddressType) (
 // IsOurAddress checks if the passed address belongs to this wallet
 //
 // This is a part of the WalletController interface.
-func (b *DcrWallet) IsOurAddress(a dcrutil.Address) bool {
+func (b *DcrWallet) IsOurAddress(a stdaddr.Address) bool {
 	validReq := &pb.ValidateAddressRequest{
-		Address: a.Address(),
+		Address: a.String(),
 	}
 	validResp, err := b.wallet.ValidateAddress(context.Background(), validReq)
 	if err != nil {
@@ -395,7 +397,7 @@ func (b *DcrWallet) SendOutputs(outputs []*wire.TxOut,
 		}
 
 		// Actually sign the input.
-		sigScript, err := txscript.SignatureScript(
+		sigScript, err := sign.SignatureScript(
 			tx, i, pkScript, txscript.SigHashAll, privKey,
 			dcrec.STEcdsaSecp256k1, true,
 		)
@@ -729,7 +731,7 @@ func minedTransactionsToDetails(
 			return nil, err
 		}
 
-		var destAddresses []dcrutil.Address
+		var destAddresses []stdaddr.Address
 		for _, txOut := range wireTx.TxOut {
 			_, outAddresses, _, err := txscript.ExtractPkScriptAddrs(
 				txOut.Version, txOut.PkScript, chainParams, false)
@@ -777,7 +779,7 @@ func unminedTransactionsToDetail(
 		return nil, err
 	}
 
-	var destAddresses []dcrutil.Address
+	var destAddresses []stdaddr.Address
 	for _, txOut := range wireTx.TxOut {
 		_, outAddresses, _, err :=
 			txscript.ExtractPkScriptAddrs(txOut.Version,
@@ -1085,9 +1087,9 @@ func (b *DcrWallet) synced() {
 
 // Bip44AddressInfo returns the BIP44 relevant (account, branch and index) of
 // the given wallet address.
-func (b *DcrWallet) Bip44AddressInfo(addr dcrutil.Address) (uint32, uint32, uint32, error) {
+func (b *DcrWallet) Bip44AddressInfo(addr stdaddr.Address) (uint32, uint32, uint32, error) {
 	req := &pb.ValidateAddressRequest{
-		Address: addr.Address(),
+		Address: addr.String(),
 	}
 	resp, err := b.wallet.ValidateAddress(context.Background(), req)
 	if err != nil {

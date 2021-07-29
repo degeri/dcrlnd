@@ -5,8 +5,8 @@ import (
 	"math"
 
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwallet"
@@ -157,7 +157,7 @@ type WalletSweepPackage struct {
 // target fee rate, and will use the utxoSource and outpointLocker as sources
 // for wallet funds.
 func CraftSweepAllTx(feeRate chainfee.AtomPerKByte, blockHeight uint32,
-	deliveryAddr dcrutil.Address, coinSelectLocker CoinSelectionLocker,
+	deliveryAddr stdaddr.Address, coinSelectLocker CoinSelectionLocker,
 	utxoSource UtxoSource, outpointLocker OutpointLocker,
 	feeEstimator chainfee.Estimator,
 	signer input.Signer, netParams *chaincfg.Params) (*WalletSweepPackage, error) {
@@ -262,7 +262,7 @@ func CraftSweepAllTx(feeRate chainfee.AtomPerKByte, blockHeight uint32,
 
 	// Next, we'll convert the delivery addr to a pkScript that we can use
 	// to create the sweep transaction.
-	deliveryPkScript, err := txscript.PayToAddrScript(deliveryAddr)
+	deliveryPkScript, err := input.PayToAddrScript(deliveryAddr)
 	if err != nil {
 		unlockOutputs()
 

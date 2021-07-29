@@ -10,8 +10,10 @@ import (
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/sign"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 )
 
@@ -68,7 +70,7 @@ func (m *MockSigner) SignOutputRaw(tx *wire.MsgTx,
 		return nil, fmt.Errorf("mock signer does not have key")
 	}
 
-	sig, err := txscript.RawTxInSignature(tx, signDesc.InputIndex,
+	sig, err := sign.RawTxInSignature(tx, signDesc.InputIndex,
 		signDesc.WitnessScript, signDesc.HashType, privKey.Serialize(),
 		dcrec.STEcdsaSecp256k1)
 	if err != nil {
@@ -87,14 +89,14 @@ func (m *MockSigner) ComputeInputScript(tx *wire.MsgTx, signDesc *SignDescriptor
 
 	switch scriptType {
 	case txscript.PubKeyHashTy:
-		privKey := m.findKey(addresses[0].ScriptAddress(), signDesc.SingleTweak,
+		privKey := m.findKey(addresses[0].(stdaddr.Hash160er).Hash160()[:], signDesc.SingleTweak,
 			signDesc.DoubleTweak)
 		if privKey == nil {
 			return nil, fmt.Errorf("mock signer does not have key for "+
 				"address %v", addresses[0])
 		}
 
-		sigScript, err := txscript.SignatureScript(
+		sigScript, err := sign.SignatureScript(
 			tx, signDesc.InputIndex, signDesc.Output.PkScript,
 			txscript.SigHashAll, privKey.Serialize(),
 			dcrec.STEcdsaSecp256k1, true,

@@ -1,8 +1,8 @@
 package lnwallet
 
 import (
-	"decred.org/dcrwallet/wallet/txrules"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"decred.org/dcrwallet/v2/wallet/txrules"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwallet/chainfee"
 )

@@ -16,7 +16,7 @@ import (
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrlnd/lnwire"
 )
 
@@ -62,9 +62,9 @@ var (
 	testExpiry0  = time.Duration(0) * time.Second
 	testExpiry60 = time.Duration(60) * time.Second
 
-	testAddrTestnet, _     = dcrutil.DecodeAddress("TsR28UZRprhgQQhzWns2M6cAwchrNVvbYq2", chaincfg.TestNet3Params())
-	testRustyAddr, _       = dcrutil.DecodeAddress("DsQxuVRvS4eaJ42dhQEsCXauMWjvopWgrVg", chaincfg.MainNetParams())
-	testAddrMainnetP2SH, _ = dcrutil.DecodeAddress("DcXTb4QtmnyRsnzUVViYQawqFE5PuYTdX2C", chaincfg.MainNetParams())
+	testAddrTestnet, _     = stdaddr.DecodeAddress("TsR28UZRprhgQQhzWns2M6cAwchrNVvbYq2", chaincfg.TestNet3Params())
+	testRustyAddr, _       = stdaddr.DecodeAddress("DsQxuVRvS4eaJ42dhQEsCXauMWjvopWgrVg", chaincfg.MainNetParams())
+	testAddrMainnetP2SH, _ = stdaddr.DecodeAddress("DcXTb4QtmnyRsnzUVViYQawqFE5PuYTdX2C", chaincfg.MainNetParams())
 
 	testHopHintPubkeyBytes1, _ = hex.DecodeString("029e03a901b85534ff1e92c43c74431f7ce72046060fcf7a95c37e148f78c77255")
 	testHopHintPubkey1, _      = secp256k1.ParsePubKey(testHopHintPubkeyBytes1)

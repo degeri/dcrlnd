@@ -18,7 +18,7 @@ import (
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4/sign"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/channeldb"
@@ -884,7 +884,7 @@ func (m *mockSigner) SignOutputRaw(tx *wire.MsgTx,
 			signDesc.DoubleTweak)
 	}
 
-	sig, err := txscript.RawTxInSignature(tx,
+	sig, err := sign.RawTxInSignature(tx,
 		signDesc.InputIndex, witnessScript, signDesc.HashType,
 		privKey.Serialize(), dcrec.STEcdsaSecp256k1)
 	if err != nil {
@@ -909,7 +909,7 @@ func (m *mockSigner) ComputeInputScript(tx *wire.MsgTx, signDesc *input.SignDesc
 			signDesc.DoubleTweak)
 	}
 
-	sigScript, err := txscript.SignatureScript(tx,
+	sigScript, err := sign.SignatureScript(tx,
 		signDesc.InputIndex, signDesc.Output.PkScript,
 		signDesc.HashType, privKey.Serialize(), dcrec.STEcdsaSecp256k1, true)
 	if err != nil {

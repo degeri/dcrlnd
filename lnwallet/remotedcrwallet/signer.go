@@ -8,13 +8,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "decred.org/dcrwallet/rpc/walletrpc"
+	pb "decred.org/dcrwallet/v2/rpc/walletrpc"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/sign"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/keychain"
@@ -129,7 +130,7 @@ func (b *DcrWallet) SignOutputRaw(tx *wire.MsgTx,
 	}
 
 	// TODO(roasbeef): generate sighash midstate if not present?
-	sig, err := txscript.RawTxInSignature(
+	sig, err := sign.RawTxInSignature(
 		tx, signDesc.InputIndex,
 		witnessScript, signDesc.HashType, privKey.Serialize(),
 		dcrec.STEcdsaSecp256k1,
@@ -192,7 +193,7 @@ func (b *DcrWallet) ComputeInputScript(tx *wire.MsgTx,
 	}
 
 	validAddrReq := &pb.ValidateAddressRequest{
-		Address: addrs[0].Address(),
+		Address: addrs[0].String(),
 	}
 	validAddrResp, err := b.wallet.ValidateAddress(context.Background(), validAddrReq)
 	if err != nil {
@@ -233,7 +234,7 @@ func (b *DcrWallet) ComputeInputScript(tx *wire.MsgTx,
 
 	// Generate a valid witness stack for the input.
 	// TODO(roasbeef): adhere to passed HashType
-	sigScript, err := txscript.SignatureScript(tx, signDesc.InputIndex,
+	sigScript, err := sign.SignatureScript(tx, signDesc.InputIndex,
 		script, signDesc.HashType, privKey.Serialize(),
 		dcrec.STEcdsaSecp256k1, true)
 	if err != nil {

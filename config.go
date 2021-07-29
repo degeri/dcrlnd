@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrlnd/autopilot"
 	"github.com/decred/dcrlnd/build"
 	"github.com/decred/dcrlnd/chanbackup"

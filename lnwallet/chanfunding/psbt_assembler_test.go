@@ -13,7 +13,8 @@ import (
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/internal/psbt"
@@ -79,7 +80,7 @@ func TestPsbtIntent(t *testing.T) {
 		t.Fatalf("error calculating script: %v", err)
 	}
 	witnessScriptHash := sha256.Sum256(script)
-	addr, err := dcrutil.NewAddressScriptHash(
+	addr, err := stdaddr.NewAddressScriptHashV0(
 		witnessScriptHash[:], &params,
 	)
 	if err != nil {
@@ -89,7 +90,7 @@ func TestPsbtIntent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get funding params: %v", err)
 	}
-	if addr.Address() != fundingAddr.Address() {
+	if addr.String() != fundingAddr.String() {
 		t.Fatalf("unexpected address. got %s wanted %s", fundingAddr,
 			addr)
 	}
@@ -215,7 +216,7 @@ func TestPsbtIntentBasePsbt(t *testing.T) {
 		t.Fatalf("error calculating script: %v", err)
 	}
 	witnessScriptHash := sha256.Sum256(script)
-	addr, err := dcrutil.NewAddressScriptHash(
+	addr, err := stdaddr.NewAddressScriptHashV0(
 		witnessScriptHash[:], &params,
 	)
 	if err != nil {
@@ -240,7 +241,7 @@ func TestPsbtIntentBasePsbt(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get funding params: %v", err)
 	}
-	if addr.Address() != newAddr.Address() {
+	if addr.String() != newAddr.String() {
 		t.Fatalf("unexpected address. got %s wanted %s", newAddr,
 			addr)
 	}

@@ -20,8 +20,8 @@ import (
 	"github.com/decred/dcrlnd/lnrpc"
 	"github.com/decred/dcrlnd/lnwallet"
 
-	pb "decred.org/dcrwallet/rpc/walletrpc"
-	"decred.org/dcrwallet/wallet"
+	pb "decred.org/dcrwallet/v2/rpc/walletrpc"
+	"decred.org/dcrwallet/v2/wallet"
 	"github.com/decred/dcrlnd/lnwallet/dcrwallet"
 	walletloader "github.com/decred/dcrlnd/lnwallet/dcrwallet/loader"
 	"google.golang.org/grpc"

@@ -8,8 +8,8 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwire"
 	"github.com/decred/dcrlnd/watchtower/blob"
 	"github.com/decred/dcrlnd/watchtower/wtdb"
@@ -20,10 +20,10 @@ import (
 
 var (
 	// addr is the server's reward address given to watchtower clients.
-	addr, _ = dcrutil.DecodeAddress("TsVDyY1k1N2jZ7xYuoA1PEbwSP2mQnXR9qb",
+	addr, _ = stdaddr.DecodeAddress("TsVDyY1k1N2jZ7xYuoA1PEbwSP2mQnXR9qb",
 		chaincfg.TestNet3Params())
 
-	addrScript, _ = txscript.PayToAddrScript(addr)
+	addrScript, _ = input.PayToAddrScript(addr)
 
 	testnetChainHash = chaincfg.TestNet3Params().GenesisHash
 
@@ -57,7 +57,7 @@ func initServer(t *testing.T, db wtserver.DB,
 		DB:           db,
 		ReadTimeout:  timeout,
 		WriteTimeout: timeout,
-		NewAddress: func() (dcrutil.Address, error) {
+		NewAddress: func() (stdaddr.Address, error) {
 			return addr, nil
 		},
 		ChainHash: testnetChainHash,

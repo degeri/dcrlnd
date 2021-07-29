@@ -13,11 +13,14 @@ import (
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	jsonrpctypes "github.com/decred/dcrd/rpc/jsonrpc/types/v2"
+	"github.com/decred/dcrd/dcrutil/v4"
+	jsonrpctypes "github.com/decred/dcrd/rpc/jsonrpc/types/v3"
 	"github.com/decred/dcrd/rpctest"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/sign"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
+	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/internal/testutils"
 )
 
@@ -41,12 +44,12 @@ func randPubKeyHashScript() ([]byte, *secp256k1.PrivateKey, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	addrPk, _ := dcrutil.NewAddressSecpPubKey(
-		privKey.PubKey().SerializeCompressed(), NetParams,
+	addrPk, _ := stdaddr.NewAddressPubKeyEcdsaSecp256k1V0(
+		privKey.PubKey(), NetParams,
 	)
 	testAddr := addrPk.AddressPubKeyHash()
 
-	pkScript, err := txscript.PayToAddrScript(testAddr)
+	pkScript, err := input.PayToAddrScript(testAddr)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -157,7 +160,7 @@ func CreateSpendTx(t *testing.T, prevOutPoint *wire.OutPoint,
 	spendingTx.AddTxIn(&wire.TxIn{PreviousOutPoint: *prevOutPoint})
 	spendingTx.AddTxOut(&wire.TxOut{Value: 1e8, PkScript: prevOutput.PkScript})
 
-	sigScript, err := txscript.SignatureScript(
+	sigScript, err := sign.SignatureScript(
 		spendingTx, 0, prevOutput.PkScript, txscript.SigHashAll,
 		privKey.Serialize(), dcrec.STEcdsaSecp256k1, true,
 	)

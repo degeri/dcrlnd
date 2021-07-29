@@ -15,13 +15,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/decred/dcrd/blockchain/stake/v3"
-	"github.com/decred/dcrd/blockchain/v3"
+	"github.com/decred/dcrd/blockchain/stake/v4"
+	"github.com/decred/dcrd/blockchain/v4"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/channeldb"
 	"github.com/decred/dcrlnd/input"
@@ -1057,7 +1057,7 @@ func createTestChannelsForVectors(tc *testContext, chanType channeldb.ChannelTyp
 // commitment, etc) is reasonably sane according to consensus and standardness
 // checks that don't require a full backing blockchain to verify.
 func checkLnTransactionSanity(tx *wire.MsgTx, utxos map[wire.OutPoint]*wire.TxOut, netParams *chaincfg.Params) error {
-	err := blockchain.CheckTransactionSanity(tx, netParams, false)
+	err := blockchain.CheckTransactionSanity(tx, netParams)
 	if err != nil {
 		return fmt.Errorf("error checking tx sanity: %v", err)
 	}

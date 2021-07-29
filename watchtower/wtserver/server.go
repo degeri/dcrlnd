@@ -10,7 +10,7 @@ import (
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/connmgr"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrlnd/keychain"
 	"github.com/decred/dcrlnd/lnwire"
 	"github.com/decred/dcrlnd/watchtower/wtdb"
@@ -51,7 +51,7 @@ type Config struct {
 
 	// NewAddress is used to generate reward addresses, where a cut of
 	// successfully sent funds can be received.
-	NewAddress func() (dcrutil.Address, error)
+	NewAddress func() (stdaddr.Address, error)
 
 	// ChainHash identifies the network that the server is watching.
 	ChainHash chainhash.Hash

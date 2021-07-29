@@ -6,10 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"decred.org/dcrwallet/wallet/txauthor"
+	"decred.org/dcrwallet/v2/wallet/txauthor"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/input"
 	"github.com/decred/dcrlnd/lnwallet/chainfee"
@@ -114,7 +115,7 @@ type TransactionDetail struct {
 	TotalFees int64
 
 	// DestAddresses are the destinations for a transaction
-	DestAddresses []dcrutil.Address
+	DestAddresses []stdaddr.Address
 
 	// RawTx returns the raw serialized transaction.
 	RawTx []byte
@@ -172,7 +173,7 @@ type WalletController interface {
 	// address should be returned. The type of address returned is dictated
 	// by the wallet's capabilities, and may be of type: p2sh, p2pkh,
 	// etc.
-	NewAddress(addrType AddressType, change bool) (dcrutil.Address, error)
+	NewAddress(addrType AddressType, change bool) (stdaddr.Address, error)
 
 	// LastUnusedAddress returns the last *unused* address known by the
 	// wallet. An address is unused if it hasn't received any payments.
@@ -180,10 +181,10 @@ type WalletController interface {
 	// "freshest" address without having to worry about "address inflation"
 	// caused by continual refreshing. Similar to NewAddress it can derive
 	// a specified address type. By default, this is a non-change address.
-	LastUnusedAddress(addrType AddressType) (dcrutil.Address, error)
+	LastUnusedAddress(addrType AddressType) (stdaddr.Address, error)
 
 	// IsOurAddress checks if the passed address belongs to this wallet
-	IsOurAddress(a dcrutil.Address) bool
+	IsOurAddress(a stdaddr.Address) bool
 
 	// SendOutputs funds, signs, and broadcasts a Decred transaction paying
 	// out to the specified outputs. In the case the wallet has insufficient

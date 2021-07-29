@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/decred/dcrd/chaincfg/v3"
-	"github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/rpcclient/v7"
 
-	"decred.org/dcrwallet/chain"
-	"decred.org/dcrwallet/errors"
+	"decred.org/dcrwallet/v2/chain"
+	"decred.org/dcrwallet/v2/errors"
 )
 
 // RPCSyncer implements the required methods for synchronizing a DcrWallet

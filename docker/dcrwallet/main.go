@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	pb "decred.org/dcrwallet/rpc/walletrpc"
+	pb "decred.org/dcrwallet/v2/rpc/walletrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

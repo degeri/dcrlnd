@@ -10,8 +10,9 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/channeldb"
@@ -161,7 +162,7 @@ type chainWatcherConfig struct {
 
 	// isOurAddr is a function that returns true if the passed address is
 	// known to us.
-	isOurAddr func(dcrutil.Address) bool
+	isOurAddr func(stdaddr.Address) bool
 
 	// extractStateNumHint extracts the encoded state hint using the passed
 	// obfuscater. This is used by the chain watcher to identify which

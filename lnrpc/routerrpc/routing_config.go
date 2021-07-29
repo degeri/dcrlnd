@@ -3,7 +3,7 @@ package routerrpc
 import (
 	"time"
 
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 )
 
 // RoutingConfig contains the configurable parameters that control routing.

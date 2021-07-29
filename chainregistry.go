@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"decred.org/dcrwallet/wallet"
+	"decred.org/dcrwallet/v2/wallet"
 	"github.com/decred/dcrd/chaincfg/chainhash"
-	"github.com/decred/dcrd/rpcclient/v6"
+	"github.com/decred/dcrd/rpcclient/v7"
 	"github.com/decred/dcrlnd/chainntnfs"
 	"github.com/decred/dcrlnd/chainntnfs/dcrdnotify"
 	"github.com/decred/dcrlnd/chainntnfs/dcrwnotify"

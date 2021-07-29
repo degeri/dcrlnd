@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 
 	"github.com/decred/dcrd/chaincfg/chainhash"
-	"github.com/decred/dcrd/gcs/v2"
+	"github.com/decred/dcrd/gcs/v3"
 )
 
 type HistoricalChainSource interface {

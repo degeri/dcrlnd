@@ -10,13 +10,14 @@ import (
 	"sync/atomic"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/decred/dcrd/blockchain/v3"
+	"github.com/decred/dcrd/blockchain/v4"
 	"github.com/decred/dcrd/chaincfg/chainhash"
 	"github.com/decred/dcrd/chaincfg/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
-	"github.com/decred/dcrd/dcrutil/v3/txsort"
-	"github.com/decred/dcrd/txscript/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
+	"github.com/decred/dcrd/dcrutil/v4/txsort"
+	"github.com/decred/dcrd/txscript/v4"
+	"github.com/decred/dcrd/txscript/v4/stdaddr"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/channeldb"
 	"github.com/decred/dcrlnd/input"
@@ -657,7 +658,7 @@ func (l *LightningWallet) handleFundingReserveRequest(req *InitFundingReserveMsg
 			MinConfs:     req.MinConfs,
 			SubtractFees: req.SubtractFees,
 			FeeRate:      req.FundingFeePerKB,
-			ChangeAddr: func() (dcrutil.Address, error) {
+			ChangeAddr: func() (stdaddr.Address, error) {
 				return l.NewAddress(PubKeyHash, true)
 			},
 		}
@@ -926,7 +927,7 @@ func CreateCommitmentTxns(localBalance, remoteBalance dcrutil.Amount,
 		return nil, nil, err
 	}
 
-	err = blockchain.CheckTransactionSanity(ourCommitTx, chainParams, false)
+	err = blockchain.CheckTransactionSanity(ourCommitTx, chainParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -939,7 +940,7 @@ func CreateCommitmentTxns(localBalance, remoteBalance dcrutil.Amount,
 		return nil, nil, err
 	}
 
-	err = blockchain.CheckTransactionSanity(theirCommitTx, chainParams, false)
+	err = blockchain.CheckTransactionSanity(theirCommitTx, chainParams)
 	if err != nil {
 		return nil, nil, err
 	}

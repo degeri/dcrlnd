@@ -6,7 +6,7 @@ import (
 	"net"
 
 	"github.com/decred/dcrd/dcrec/secp256k1/v3"
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/autopilot"
 	"github.com/decred/dcrlnd/lncfg"

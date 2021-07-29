@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/decred/dcrd/dcrutil/v3"
+	"github.com/decred/dcrd/dcrutil/v4"
 	"github.com/decred/dcrd/wire"
 	"github.com/decred/dcrlnd/chanbackup"
 	"github.com/decred/dcrlnd/lnrpc"
