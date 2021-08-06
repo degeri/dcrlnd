@@ -92,6 +92,16 @@ https://decred.org/community
 
   And a sample config file with annotated options is [also available here](sample-dcrlnd.conf).
 
+## Quick Simnet Network
+
+A shell script that uses tmux to setup a 3-node simnet network (along with
+appropriate dcrd and dcrwallet nodes) is available in
+[contrib/dcrlnd-tmux-3node.sh](contrib/dcrlnd-tmux-3node.sh).
+
+Note that this requires having `dcrlnd` and `dcrlncli` in your `$PATH` variable,
+as well as compatible versions of `dcrd` and `dcrwallet`.
+
+
 ## Docker
   To run lnd from Docker, please see the main [Docker instructions](docs/DOCKER.md)
 
