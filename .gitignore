@@ -48,6 +48,7 @@ chainscan/csdrivers/*.log
 chainntnfs/*.log
 chainntnfs/.miner-logs*
 routing/chainview/*.log
+dcrlnd.log
 
 cmd/cmd
 *.key

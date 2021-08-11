@@ -1,4 +1,4 @@
-// +build !stdlog,!nolog
+// +build !stdlog,!nolog,!filelog
 
 package build
 
