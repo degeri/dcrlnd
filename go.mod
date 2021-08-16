@@ -9,7 +9,8 @@ require (
 	github.com/Yawning/aez v0.0.0-20180408160647-ec7426b44926
 	github.com/btcsuite/btcwallet/walletdb v1.3.3
 	github.com/davecgh/go-spew v1.1.1
-	github.com/decred/dcrd v1.2.1-0.20210804150906-75b0f68a3583
+	github.com/decred/dcrd v1.2.1-0.20210816181553-5444fa50b93d
+	github.com/decred/dcrd/addrmgr/v2 v2.0.0-20210802141345-893802fc06b0
 	github.com/decred/dcrd/bech32 v1.1.1
 	github.com/decred/dcrd/blockchain/stake/v4 v4.0.0-20210802141345-893802fc06b0
 	github.com/decred/dcrd/blockchain/standalone/v2 v2.0.1-0.20210802141345-893802fc06b0
