@@ -35,7 +35,8 @@ type SpvBackendConfig struct {
 // using this node as a chain backend.
 func (b SpvBackendConfig) GenArgs() []string {
 	return []string{
-		"--node=dcrw",
+		"--dcrwallet.spv",
+		"--dcrwallet.spvconnect=" + b.harness.P2PAddress(),
 	}
 }
 

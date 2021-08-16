@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -212,17 +213,20 @@ func newChainControlFromConfig(cfg *Config, localDB, remoteDB *channeldb.DB,
 	// mode (using the wallet for chain operations).
 	if conn != nil && cfg.Node != "dcrw" {
 		return nil, fmt.Errorf("remote wallet mode only supports " +
-			"'dcrw' node config")
+			"'node=dcrw' config")
 	}
 
-	// When running in embedded wallet mode, we require an underlying dcrd
-	// instance whether running in dcrd or dcrw node modes, so we test the
-	// connection to the dcrd instance.
-	//
-	// Conversely, when running in remote wallet mode we only allow the
-	// dcrw node mode (per the above conditional check) so there's no need
-	// to check the connection to a dcrd instance.
-	if conn == nil {
+	// When running in embedded wallet mode with spv on, we only support
+	// running in dcrw mode.
+	if conn == nil && cfg.Dcrwallet.SPV && cfg.Node != "dcrw" {
+		return nil, fmt.Errorf("embedded wallet in SPV mode only " +
+			"supports 'node=dcrw' config")
+	}
+
+	// We only require a dcrd connection when running in embedded mode and
+	// not in SPV mode.
+	needsDcrd := conn == nil && !cfg.Dcrwallet.SPV
+	if needsDcrd {
 		// Load dcrd's TLS cert for the RPC connection.  If a raw cert
 		// was specified in the config, then we'll set that directly.
 		// Otherwise, we attempt to read the cert from the path
@@ -331,13 +335,22 @@ func newChainControlFromConfig(cfg *Config, localDB, remoteDB *channeldb.DB,
 		cc.chainIO = wc
 
 	default:
-		// Initialize an RPC syncer for this wallet and use it as
-		// blockchain IO source.
-		//
-		// We don't currently support running an embedded wallet in spv
-		// mode.
-		syncer, err := dcrwallet.NewRPCSyncer(*rpcConfig,
-			activeNetParams.Params)
+		// Initialize the appropriate syncer.
+		var syncer dcrwallet.WalletSyncer
+		switch cfg.Dcrwallet.SPV {
+		case false:
+			syncer, err = dcrwallet.NewRPCSyncer(*rpcConfig,
+				activeNetParams.Params)
+		case true:
+			spvCfg := &dcrwallet.SPVSyncerConfig{
+				Peers: cfg.Dcrwallet.SPVConnect,
+				Net:   activeNetParams.Params,
+				AppDataDir: filepath.Join(cfg.DataDir,
+					activeNetParams.Params.Name),
+			}
+			syncer, err = dcrwallet.NewSPVSyncer(spvCfg)
+		}
+
 		if err != nil {
 			return nil, err
 		}
