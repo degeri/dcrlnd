@@ -52,7 +52,13 @@ jobs:
       fail-fast: false
       matrix:
         go: [1.16]
-        testsuite: ["unit-race", "itest-only", "itest-only walletimpl=remotewallet", "itest-only walletimpl=embeddedwallet_dcrw", "itest-only walletimpl=remotewallet backend=spv"]
+        testsuite:
+          - unit-race # unit tests
+          - itest-only # embedded wallet using dcrd for sync and chain ops
+          - itest-only walletimpl=embeddedwallet_dcrw # embedded wallet, dcrd sync but dcrw chain ops
+          - itest-only walletimpl=embeddedwallet_dcrw backend=spv # embedded wallet, spv sync and dcrw chain ops
+          - itest-only walletimpl=remotewallet # remote wallet dcrd sync
+          - itest-only walletimpl=remotewallet backend=spv # remote wallet spv sync
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
