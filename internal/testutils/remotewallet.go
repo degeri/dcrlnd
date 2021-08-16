@@ -55,15 +55,46 @@ func nextAvailablePort() int {
 	panic("no ports available for listening")
 }
 
-func consumeSyncMsgs(syncStream pb.WalletLoaderService_RpcSyncClient, onSyncedChan chan struct{}) {
+type rpcSyncer struct {
+	c pb.WalletLoaderService_RpcSyncClient
+}
+
+func (r *rpcSyncer) RecvSynced() (bool, error) {
+	msg, err := r.c.Recv()
+	if err != nil {
+		// All errors are final here.
+		return false, err
+	}
+	return msg.Synced, nil
+}
+
+type spvSyncer struct {
+	c pb.WalletLoaderService_SpvSyncClient
+}
+
+func (r *spvSyncer) RecvSynced() (bool, error) {
+	msg, err := r.c.Recv()
+	if err != nil {
+		// All errors are final here.
+		return false, err
+	}
+	return msg.Synced, nil
+}
+
+type syncer interface {
+	RecvSynced() (bool, error)
+}
+
+func consumeSyncMsgs(syncStream syncer, onSyncedChan chan struct{}) {
 	for {
-		msg, err := syncStream.Recv()
+		synced, err := syncStream.RecvSynced()
 		if err != nil {
 			// All errors are final here.
 			return
 		}
-		if msg.Synced {
+		if synced {
 			onSyncedChan <- struct{}{}
+			return
 		}
 	}
 }
@@ -81,13 +112,21 @@ func tlsCertFromFile(fname string) (*x509.CertPool, error) {
 	return cp, nil
 }
 
+type SPVConfig struct {
+	Address string
+}
+
+// NewCustomTestRemoteDcrwallet runs a dcrwallet instance for use during tests.
 func NewCustomTestRemoteDcrwallet(t TB, nodeName, dataDir string,
 	hdSeed, privatePass []byte,
-	dcrd *rpcclient.ConnConfig) (*grpc.ClientConn, func()) {
+	dcrd *rpcclient.ConnConfig, spv *SPVConfig) (*grpc.ClientConn, func()) {
 
-	// Save the dcrd ca file in the wallet dir.
-	cafile := path.Join(dataDir, "ca.cert")
-	ioutil.WriteFile(cafile, dcrd.Certificates, 0644)
+	if dcrd == nil && spv == nil {
+		t.Fatalf("either dcrd or spv config needs to be specified")
+	}
+	if dcrd != nil && spv != nil {
+		t.Fatalf("only one of dcrd or spv config needs to be specified")
+	}
 
 	tlsCertPath := path.Join(dataDir, "rpc.cert")
 	tlsKeyPath := path.Join(dataDir, "rpc.key")
@@ -99,10 +138,6 @@ func NewCustomTestRemoteDcrwallet(t TB, nodeName, dataDir string,
 	args := []string{
 		"--noinitialload",
 		"--debuglevel=debug",
-		"--rpcconnect=" + dcrd.Host,
-		"--username=" + dcrd.User,
-		"--password=" + dcrd.Pass,
-		"--cafile=" + cafile,
 		"--simnet",
 		"--nolegacyrpc",
 		"--grpclisten=" + addr,
@@ -202,17 +237,32 @@ func NewCustomTestRemoteDcrwallet(t TB, nodeName, dataDir string,
 		t.Fatalf("unable to create wallet: %v", err)
 	}
 
-	// Run the rpc syncer.
-	req := &pb.RpcSyncRequest{
-		NetworkAddress:    dcrd.Host,
-		Username:          dcrd.User,
-		Password:          []byte(dcrd.Pass),
-		Certificate:       dcrd.Certificates,
-		DiscoverAccounts:  true,
-		PrivatePassphrase: privatePass,
-	}
 	ctxSync, cancelSync := context.WithCancel(context.Background())
-	syncStream, err := loader.RpcSync(ctxSync, req)
+	var syncStream syncer
+	if dcrd != nil {
+		// Run the rpc syncer.
+		req := &pb.RpcSyncRequest{
+			NetworkAddress:    dcrd.Host,
+			Username:          dcrd.User,
+			Password:          []byte(dcrd.Pass),
+			Certificate:       dcrd.Certificates,
+			DiscoverAccounts:  true,
+			PrivatePassphrase: privatePass,
+		}
+		var res pb.WalletLoaderService_RpcSyncClient
+		res, err = loader.RpcSync(ctxSync, req)
+		syncStream = &rpcSyncer{c: res}
+	} else if spv != nil {
+		// Run the spv syncer.
+		req := &pb.SpvSyncRequest{
+			SpvConnect:        []string{spv.Address},
+			DiscoverAccounts:  true,
+			PrivatePassphrase: privatePass,
+		}
+		var res pb.WalletLoaderService_SpvSyncClient
+		res, err = loader.SpvSync(ctxSync, req)
+		syncStream = &spvSyncer{c: res}
+	}
 	if err != nil {
 		cancelSync()
 		t.Fatalf("error running rpc sync: %v", err)
@@ -290,7 +340,7 @@ func NewTestRemoteDcrwallet(t TB, dcrd *rpcclient.ConnConfig) (*grpc.ClientConn,
 
 	var seed [32]byte
 	c, tearDownWallet := NewCustomTestRemoteDcrwallet(t, "remotedcrw", tempDir,
-		seed[:], []byte("pass"), dcrd)
+		seed[:], []byte("pass"), dcrd, nil)
 	tearDown := func() {
 		tearDownWallet()
 

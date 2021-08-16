@@ -152,6 +152,11 @@ func (b *DcrWallet) BackEnd() string {
 		return "dcrd"
 	}
 
+	if _, is := b.syncer.(*SPVSyncer); is {
+		// This package only supports full node backends for the moment
+		return "dcrw-spv"
+	}
+
 	return ""
 }
 
@@ -892,7 +897,7 @@ func (b *DcrWallet) InitialSyncChannel() <-chan struct{} {
 	return b.syncedChan
 }
 
-func (b *DcrWallet) onRPCSyncerSynced(synced bool) {
+func (b *DcrWallet) onSyncerSynced(synced bool) {
 	dcrwLog.Debug("RPC syncer notified wallet is synced")
 
 	if atomic.CompareAndSwapUint32(&b.atomicWalletSynced, syncStatusLostSync, syncStatusSynced) {

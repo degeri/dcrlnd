@@ -13,7 +13,7 @@ const (
 var (
 	// We currently only support full chain sync (no spv), so hardcode
 	// the available backends.
-	availableBackends = []string{"dcrd"}
+	availableBackends = []string{"dcrd", "spv"}
 )
 
 // createNewWallet creates a new instance of DcrWallet given the proper list of

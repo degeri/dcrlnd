@@ -2,6 +2,8 @@ package dcrwallet
 
 import (
 	"decred.org/dcrwallet/v2/chain"
+	"decred.org/dcrwallet/v2/p2p"
+	"decred.org/dcrwallet/v2/spv"
 	base "decred.org/dcrwallet/v2/wallet"
 	"decred.org/dcrwallet/v2/wallet/udb"
 	"github.com/decred/dcrlnd/build"
@@ -33,5 +35,7 @@ func UseLogger(logger slog.Logger) {
 	base.UseLogger(logger)
 	loader.UseLogger(logger)
 	chain.UseLogger(logger)
+	spv.UseLogger(logger)
+	p2p.UseLogger(logger)
 	udb.UseLogger(logger)
 }

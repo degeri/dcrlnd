@@ -1437,6 +1437,16 @@ func testTransactionSubscriptions(miner *rpctest.Harness,
 	vw *rpctest.VotingWallet, alice, _ *lnwallet.LightningWallet,
 	t *testing.T) {
 
+	// Generate a block and wait for wallet sync to ensure any outstanding
+	// txs from previous tests won't interfere with this test.
+	if _, err := vw.GenerateBlocks(context.TODO(), 1); err != nil {
+		t.Fatalf("unable to generate block: %v", err)
+	}
+	err := waitForWalletSync(miner, alice)
+	if err != nil {
+		t.Fatalf("Couldn't sync Alice's wallet: %v", err)
+	}
+
 	// First, check to see if this wallet meets the TransactionNotifier
 	// interface, if not then we'll skip this test for this particular
 	// implementation of the WalletController.
@@ -2165,6 +2175,13 @@ func testSignOutputUsingTweaks(r *rpctest.Harness,
 func testReorgWalletBalance(r *rpctest.Harness, vw *rpctest.VotingWallet,
 	w *lnwallet.LightningWallet, _ *lnwallet.LightningWallet,
 	t *testing.T) {
+
+	// Currently disabled due to
+	// https://github.com/decred/dcrwallet/issues/1710. Re-assess after
+	// that is fixed.
+	if w.BackEnd() == "dcrw-spv" {
+		t.Skipf("Skipping for SPV for the moment")
+	}
 
 	// We first mine a few blocks to ensure any transactions still in the
 	// mempool confirm, and then get the original balance, before a
@@ -3142,13 +3159,15 @@ func runTests(t *testing.T, walletDriver *lnwallet.WalletDriver,
 	if err != nil {
 		t.Fatalf("unable to create temp directory: %v", err)
 	}
-	defer os.RemoveAll(tempTestDirAlice)
+	t.Logf("Alice Dir: %s", tempTestDirAlice)
+	//defer os.RemoveAll(tempTestDirAlice)
 
 	tempTestDirBob, err := ioutil.TempDir("", "lnwallet")
 	if err != nil {
 		t.Fatalf("unable to create temp directory: %v", err)
 	}
-	defer os.RemoveAll(tempTestDirBob)
+	t.Logf("Bob Dir: %s", tempTestDirBob)
+	//defer os.RemoveAll(tempTestDirBob)
 
 	aliceDBDir := filepath.Join(tempTestDirAlice, "cdb")
 	aliceCDB, err := channeldb.Open(aliceDBDir)
@@ -3204,6 +3223,21 @@ func runTests(t *testing.T, walletDriver *lnwallet.WalletDriver,
 			if err != nil {
 				t.Fatalf("unable to make bob chain IO: %v", err)
 			}
+		case "spv":
+			spvCfg := &dcrwallet.SPVSyncerConfig{
+				Net:        netParams,
+				Peers:      []string{miningNode.P2PAddress()},
+				AppDataDir: tempTestDirAlice, // Safe to reuse since we use a fixed addr.
+			}
+
+			aliceSyncer, err = dcrwallet.NewSPVSyncer(spvCfg)
+			if err != nil {
+				t.Fatalf("unable to make alice spv syncer: %v", err)
+			}
+			bobSyncer, err = dcrwallet.NewSPVSyncer(spvCfg)
+			if err != nil {
+				t.Fatalf("unable to make bob spv syncer: %v", err)
+			}
 		default:
 			t.Fatalf("unknown chain driver: %v", backEnd)
 		}
@@ -3239,7 +3273,15 @@ func runTests(t *testing.T, walletDriver *lnwallet.WalletDriver,
 		}
 		bobSigner = bobWalletController.(*dcrwallet.DcrWallet)
 		bobKeyRing = bobWalletController.(*dcrwallet.DcrWallet)
+
+		if backEnd == "spv" {
+			aliceBio = aliceWalletController.(*dcrwallet.DcrWallet)
+			bobBio = bobWalletController.(*dcrwallet.DcrWallet)
+		}
 	case "remotedcrwallet":
+		var rpcSyncCfg *rpcclient.ConnConfig
+		var spvSyncCfg *testutils.SPVConfig
+
 		switch backEnd {
 		case "dcrd":
 			aliceBio, err = dcrwallet.NewRPCChainIO(rpcConfig,
@@ -3253,12 +3295,19 @@ func runTests(t *testing.T, walletDriver *lnwallet.WalletDriver,
 				t.Fatalf("unable to make chain rpc: %v", err)
 			}
 
+			rpcSyncCfg = &rpcConfig
+
+		case "spv":
+			spvSyncCfg = &testutils.SPVConfig{
+				Address: miningNode.P2PAddress(),
+			}
+
 		default:
 			t.Fatalf("unknown chain driver: %v", backEnd)
 		}
 		aliceConn, aliceCleanup := testutils.NewCustomTestRemoteDcrwallet(
 			t, "Alice", tempTestDirAlice, aliceSeedBytes,
-			alicePrivatePass, &rpcConfig,
+			alicePrivatePass, rpcSyncCfg, spvSyncCfg,
 		)
 		defer aliceCleanup()
 		if err := testutils.SetPerAccountPassphrase(aliceConn, alicePrivatePass); err != nil {
@@ -3280,7 +3329,7 @@ func runTests(t *testing.T, walletDriver *lnwallet.WalletDriver,
 
 		bobConn, bobCleanup := testutils.NewCustomTestRemoteDcrwallet(
 			t, "Bob", tempTestDirBob, bobSeedBytes, bobPrivatePass,
-			&rpcConfig,
+			rpcSyncCfg, spvSyncCfg,
 		)
 		defer bobCleanup()
 		if err := testutils.SetPerAccountPassphrase(bobConn, bobPrivatePass); err != nil {
@@ -3299,6 +3348,11 @@ func runTests(t *testing.T, walletDriver *lnwallet.WalletDriver,
 		}
 		bobSigner = bobWalletController.(*remotedcrwallet.DcrWallet)
 		bobKeyRing = bobWalletController.(*remotedcrwallet.DcrWallet)
+
+		if backEnd == "spv" {
+			aliceBio = aliceWalletController.(*remotedcrwallet.DcrWallet)
+			bobBio = bobWalletController.(*remotedcrwallet.DcrWallet)
+		}
 	default:
 		t.Fatalf("unknown wallet driver: %v", walletType)
 	}
@@ -3365,9 +3419,14 @@ func runTests(t *testing.T, walletDriver *lnwallet.WalletDriver,
 		testName := fmt.Sprintf("%v/%v:%v", walletType, backEnd,
 			walletTest.name)
 		success := t.Run(testName, func(t *testing.T) {
-			if backEnd == "neutrino" &&
+			if backEnd == "spv" &&
 				strings.Contains(walletTest.name, "dual funder") {
-				t.Skip("skipping dual funder tests for neutrino")
+				t.Skip("skipping dual funder tests for spv")
+			}
+
+			if backEnd == "spv" &&
+				strings.Contains(walletTest.name, "reorg ") {
+				t.Skip("skipping reorg tests for spv")
 			}
 
 			walletTest.test(miningNode, votingWallet, alice, bob, t)

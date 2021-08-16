@@ -59,7 +59,7 @@ func (s *RPCSyncer) start(w *DcrWallet) error {
 
 			syncer := chain.NewSyncer(w.wallet, &chainRpcOpts)
 			syncer.SetCallbacks(&chain.Callbacks{
-				Synced: w.onRPCSyncerSynced,
+				Synced: w.onSyncerSynced,
 			})
 
 			dcrwLog.Debugf("Starting rpc syncer")
