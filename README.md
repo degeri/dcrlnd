@@ -114,7 +114,7 @@ loss of funds.
 
 ## Security
 
-Please see the [security policy](../security/policy). 
+Please see the [security policy](https://github.com/decred/dcrlnd/security/policy). 
 
 ## Further reading
 * [Step-by-step send payment guide with docker](https://github.com/decred/dcrlnd/tree/master/docker)
